@@ -23,3 +23,5 @@ server-motd:
   motd-time: 3000L
   #加载标题输出
   load-print: true
+  #图标
+  motd-icon: favicon.ico

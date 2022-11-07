@@ -11,8 +11,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.List;
 
 import static org.bukkit.Bukkit.getLogger;
-import static vip.dicloud.dishao.config;
-import static vip.dicloud.dishao.Motd;
+import static vip.dicloud.dishao.*;
 
 class ti{
     public ti(Player player,String liyou){
@@ -125,6 +124,7 @@ public class Lisener implements org.bukkit.event.Listener {
     @EventHandler
     public void OnMotd(ServerListPingEvent e){
         e.setMotd(Motd.replace("%nl%","\n"));
+        e.setServerIcon(icon);
         if(config.getBoolean("server-motd.load-print")){
             if(!Motd.contains("%nl%")){
                 dishao.getPlugin(dishao.class).getLogger().info("ip为" + e.getAddress() + "的玩家加载了标题:" + Motd);
