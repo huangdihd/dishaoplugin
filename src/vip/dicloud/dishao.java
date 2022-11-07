@@ -21,9 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import static org.bukkit.Bukkit.getServer;
 import static vip.dicloud.dishao.config;
 import static vip.dicloud.dishao.motdl;
 import static vip.dicloud.dishao.motdt;
+import static vip.dicloud.dishao.icon;
+import static vip.dicloud.dishao.plugin;
+
 
 class Update{
     static String openFile(String filePath) {
@@ -113,6 +117,7 @@ public class dishao extends JavaPlugin {
     static ArrayList<String> motdl;
     static long motdt;
     static CachedServerIcon icon;
+    static Plugin plugin;
     public void onEnable() {
         saveDefaultConfig();
         saveConfig();
@@ -129,6 +134,7 @@ public class dishao extends JavaPlugin {
         getLogger().info("配置文件情况:");
         boolean per = config.getBoolean("permissions",true);
         boolean update = config.getBoolean("detect-updates",true);
+        plugin = getPlugin(dishao.class);
         if(per){
             getLogger().info("权限管理模块(permissions):开启");
             getLogger().info("非op玩家所拥有的权限(permissions-list):");
@@ -151,10 +157,14 @@ public class dishao extends JavaPlugin {
             try {
                 icon = getServer().loadServerIcon(new File(getDataFolder().getAbsolutePath() + File.separator + config.getString("server-motd.motd-icon")));
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }else{
-            getLogger().warning("找不到图标" + config.getString("server-motd.motd-icon"));
+            try {
+                new File(getDataFolder().getAbsolutePath() + File.separator + config.getString("server-motd.motd-icon")).createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         motdt = config.getLong("server-motd.motd-time", 3000L);
         motdl = (ArrayList<String>) config.getList("server-motd.motd-list");
@@ -713,6 +723,19 @@ class Info_Command implements TabExecutor {
                 }
                 dishao.getPlugin(dishao.class).reloadConfig();
                 config = dishao.getPlugin(dishao.class).getConfig();
+                if(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + config.getString("server-motd.motd-icon")).exists()){
+                    try {
+                        icon = plugin.getServer().loadServerIcon(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + config.getString("server-motd.motd-icon")));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    try {
+                        new File(plugin.getDataFolder().getAbsolutePath() + File.separator + config.getString("server-motd.motd-icon")).createNewFile();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 motdl = (ArrayList<String>) dishao.getPlugin(dishao.class).getConfig().getList("server-motd.motd-list");
                 motdt = config.getLong("server-motd.motd-time",3000L);
                 per = config.getBoolean("permissions",true);
