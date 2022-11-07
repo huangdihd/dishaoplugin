@@ -1,6 +1,6 @@
 name: dishao
 main: vip.dicloud.dishao
-version: 1.9-B
+version: 1.9-R
 authors: [ DicloudStudio ]
 commands:
   zisha:

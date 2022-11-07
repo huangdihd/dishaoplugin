@@ -24,4 +24,4 @@ server-motd:
   #加载标题输出
   load-print: true
   #图标
-  motd-icon: favicon.ico
+  motd-icon: favicon.png
