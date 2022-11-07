@@ -1,0 +1,57 @@
+name: dishao
+main: vip.dicloud.dishao
+version: 1.9-B
+authors: [ DicloudStudio ]
+commands:
+  zisha:
+    permission: "dishao.zisha"
+    aliases:
+      - "514"
+  help:
+    permission: "dishao.help"
+    aliases:
+      - "help"
+  tell:
+    permission: "dishao.tell"
+    aliases:
+      - "w"
+      - "tell"
+      - "msg"
+  out:
+    permission: "dishao.out"
+    aliases:
+      - "out"
+  tp:
+    permission: "dishao.tp"
+    aliases:
+      - "tp"
+  kick:
+    permission: "dishao.kick"
+    aliases:
+      - "kick"
+  dishao:
+    permission: "dishao.main_command"
+    aliases:
+      - "dishao"
+      - "ds"
+permissions:
+  dishao.tp:
+    description: Dishao plugins tp command
+  dishao.tell:
+    description: Dishao plugins tell command
+  dishao.help:
+    description: Dishao plugins help command
+  dishao.out:
+    description: Dishao plugins out command
+  dishao.zisha:
+    description: Dishao plugins zisha command
+  dishao.kick:
+    description: Dishao plugins kick command
+  dishao.main_command.info:
+    description: Dishao plugins main_info command
+  dishao.main_command:
+    description: Dishao plugins main command
+  dishao.main_command.config:
+    description: Dishao plugins main_config command
+  dishao.main_command.reload:
+    description: Dishao plugins main_reload command

@@ -1,0 +1,25 @@
+say: 在插件目录下的config.yml中的say:后面更改要输出的内容
+#是否开启dishao插件权限管理模块
+permissions: true
+#给予非op玩家的权限
+permissions-list:
+  - dishao.help
+  - dishao.tp
+  - dishao.tell
+  - dishao.out
+  - dishao.zisha
+  - bukkit.command.tps
+#非op玩家关闭的权限
+off-permissions-list:
+  - minecraft.command.seed
+#插件启动时检测更新
+detect-updates: true
+#服务器标题
+server-motd:
+  #服务器标题列表("%nl%"代表换行)
+  motd-list:
+    - 第一行%nl%第二行
+  #每个标题等待时间
+  motd-time: 3000L
+  #加载标题输出
+  load-print: true

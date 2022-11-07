@@ -1,0 +1,24 @@
+name: dishao
+main: rarityeg.helloworld.HelloWorld
+version: 1.0
+api-version: 1.16
+commands:
+  zisha:
+    aliases:
+      - "514"
+    usage: "/514 to kill you."
+    description: "to kill you."
+    permission: "dishao.zisha"
+    permission-message: "Only killer can do that!"
+  help:
+    aliases:
+      - "help"
+    usage: "/514 to need help."
+    description: "to need help."
+    permission: "dishao.help"
+  jiaoziming:
+    aliases:
+      - "jiaoziming"
+    usage: "jiaoziming"
+    description: "jiaoziming"
+    permission: "dishao.jiaoziming"
