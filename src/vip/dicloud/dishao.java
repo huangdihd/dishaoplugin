@@ -11,6 +11,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.CachedServerIcon;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.*;
@@ -111,6 +112,7 @@ public class dishao extends JavaPlugin {
     static FileConfiguration config;
     static ArrayList<String> motdl;
     static long motdt;
+    static CachedServerIcon icon;
     public void onEnable() {
         saveDefaultConfig();
         saveConfig();
@@ -144,6 +146,15 @@ public class dishao extends JavaPlugin {
             }
         }else{
             getLogger().info("权限管理模块(permissions):关闭");
+        }
+        if(new File(getDataFolder().getAbsolutePath() + File.separator + config.getString("server-motd.motd-icon")).exists()){
+            try {
+                icon = getServer().loadServerIcon(new File(getDataFolder().getAbsolutePath() + File.separator + config.getString("server-motd.motd-icon")));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }else{
+            getLogger().warning("找不到图标" + config.getString("server-motd.motd-icon"));
         }
         motdt = config.getLong("server-motd.motd-time", 3000L);
         motdl = (ArrayList<String>) config.getList("server-motd.motd-list");
