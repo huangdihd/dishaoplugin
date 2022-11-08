@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static org.bukkit.Bukkit.getServer;
 import static vip.dicloud.dishao.config;
 import static vip.dicloud.dishao.motdl;
 import static vip.dicloud.dishao.motdt;
@@ -572,17 +571,17 @@ class Info_Command implements TabExecutor {
                 if(per){
                     new Bukkitio().commandsay(commandSender,"权限管理模块(permissions):开启");
                     new Bukkitio().commandsay(commandSender,"非op玩家所拥有的权限(permissions-list):");
-                    List c = config.getList("permissions-list", null);
+                    List<?> c = config.getList("permissions-list", null);
                     String s1;
-                    for (int i = 0; i < c.size(); i++) {
-                        s1 = (String) c.get(i);
-                        new Bukkitio().commandsay(commandSender,s1);
+                    for (Object o : c) {
+                        s1 = (String) o;
+                        new Bukkitio().commandsay(commandSender, s1);
                     }
                     new Bukkitio().commandsay(commandSender,"非op玩家关闭的权限(off-permissions-list):");
                     c = config.getList("off-permissions-list", null);
-                    for (int i = 0; i < c.size(); i++) {
-                        s1 = (String) c.get(i);
-                        new Bukkitio().commandsay(commandSender,s1);
+                    for (Object o : c) {
+                        s1 = (String) o;
+                        new Bukkitio().commandsay(commandSender, s1);
                     }
                 }else{
                     new Bukkitio().commandsay(commandSender,"权限管理模块(permissions):关闭");
@@ -832,24 +831,24 @@ class Info_Command implements TabExecutor {
         }
         if(((args.length == 4 && args[2].equals("remove")) && args[0].equals("config")) && (args[1].equals("permissions-list") || args[1].equals("off-permission-list"))) {
             List n = new ArrayList<>();
-            
+
+            List s;
+            PPlayer pPlayer = new PPlayer();
             if (args[1].equals("permissions-list")) {
-                List s = config.getList("permissions-list", null);
-                PPlayer pPlayer = new PPlayer();
+                s = config.getList("permissions-list", null);
                 for (int i = 0; i < n.size(); i++) {
                     String g = (String) n.get(i);
                     s.add(g);
                 }
-                return s;
             }else{
-                List s = config.getList("off-permissions-list", null);;
-                PPlayer pPlayer = new PPlayer();
+                s = config.getList("off-permissions-list", null);
+                ;
                 for (int i = 0; i < n.size(); i++) {
                     String g = (String) n.get(i);
                     s.add(g);
                 }
-                return s;
             }
+            return s;
         }
         List n = new ArrayList<>();
         return n;
