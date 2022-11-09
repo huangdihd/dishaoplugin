@@ -19,8 +19,8 @@ server-motd:
   #服务器标题列表("%nl%"代表换行)
   motd-list:
     - 第一行%nl%第二行
-  #每个标题等待时间
-  motd-time: 3000L
+  #每个标题等待时间(毫秒)
+  motd-time: 3000
   #加载标题输出
   load-print: true
   #图标
