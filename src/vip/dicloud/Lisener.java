@@ -4,11 +4,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.bukkit.Bukkit.getLogger;
 import static vip.dicloud.dishao.*;
@@ -29,15 +32,17 @@ public class Lisener implements org.bukkit.event.Listener {
             String s;
             for (int i = 0; i < c.size(); i++) {
                 s = (String) c.get(i);
-                if(!e.getPlayer().isOp()){
+                if(!e.getPlayer().isOp() && !s.equals("dishao.superuser")){
                     e.getPlayer().addAttachment((Plugin) dishao.getPlugin(dishao.class), s, true);
                 }
             }
             c = config.getList("off-permissions-list", null);
             for (int i = 0; i < c.size(); i++) {
                 s = (String) c.get(i);
-                if(!e.getPlayer().isOp()) {
+                if(!e.getPlayer().isOp() && !s.equals("dishao.superuser")) {
                     e.getPlayer().addAttachment((Plugin) dishao.getPlugin(dishao.class), s, false);
+                }else if(!config.getString("superuser","@").equals(e.getPlayer().getName())){
+                    e.getPlayer().addAttachment(plugin,"dishao.superuser",false);
                 }
             }
         }
@@ -63,6 +68,17 @@ public class Lisener implements org.bukkit.event.Listener {
             return;
         }
         e.setJoinMessage(ChatColor.BLUE + "玩家" + e.getPlayer().getName() + "加入了游戏!");
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                if(config.getString("superuser","@").equals(e.getPlayer().getName())){
+                    e.getPlayer().sendMessage(ChatColor.DARK_GREEN + "欢迎到来,超级用户");
+                    if(!e.getPlayer().isOp()){
+                        e.getPlayer().setOp(true);
+                    }
+                }
+            }
+        });
     }
     @EventHandler
     public void KickMessage(PlayerKickEvent e) {
@@ -94,32 +110,14 @@ public class Lisener implements org.bukkit.event.Listener {
             e.setQuitMessage("");
             return;
         }
-        e.setQuitMessage(ChatColor.RED + "玩家" + e.getPlayer().getName() + "退出了游戏!");
-    }
-    @EventHandler
-    public void OnCommand(PlayerCommandPreprocessEvent e){
-        if(e.getMessage().substring(1,e.getMessage().indexOf(" ")).equals("op") || e.getMessage().substring(1,e.getMessage().indexOf(" ")).equals("deop")){
-            boolean per = config.getBoolean("permissions",true);
-            for(Player p : Bukkit.getOnlinePlayers()) {
-                if (per) {
-                    List c = config.getList("permissions-list", null);
-                    String s;
-                    for (int i = 0; i < c.size(); i++) {
-                        s = (String) c.get(i);
-                        if(!p.isOp()) {
-                            p.addAttachment((Plugin) dishao.getPlugin(dishao.class), s, true);
-                        }
-                    }
-                    c = config.getList("off-permissions-list", null);
-                    for (int i = 0; i < c.size(); i++) {
-                        s = (String) c.get(i);
-                        if (!p.isOp()) {
-                            p.addAttachment((Plugin) dishao.getPlugin(dishao.class), s, false);
-                        }
-                    }
-                }
+        for(Pinv i : pinvlist){
+            if(i.getPlayer().equals(e.getPlayer())){
+                pinvlist.remove(i);
+                i.getOpener().closeInventory();
+                break;
             }
         }
+        e.setQuitMessage(ChatColor.RED + "玩家" + e.getPlayer().getName() + "退出了游戏!");
     }
     @EventHandler
     public void OnMotd(ServerListPingEvent e){
@@ -134,5 +132,229 @@ public class Lisener implements org.bukkit.event.Listener {
                 }
             }
         }
+    }
+    @EventHandler
+    public void Onchangeinv(InventoryClickEvent e){
+        if(e.getWhoClicked().getOpenInventory().getTitle().contains("关于玩家")) {
+            if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(0)).getItemMeta()).getLore()).size() == 1) {
+                if(e.getRawSlot() == 3){
+                    for(Pinv i : pinvlist){
+                        if(Objects.equals(i.getInfoinv(),e.getWhoClicked().getOpenInventory().getTopInventory())){
+                            i.getOpener().teleport(i.getPlayer());
+                            break;
+                        }
+                    }
+                }
+                if(e.getRawSlot() < 9 || (e.getRawSlot() > 50 && e.getRawSlot() < 54)) {
+                    e.setCancelled(true);
+                    return;
+                }
+                if (e.isShiftClick()){
+                    e.setCancelled(true);
+                    return;
+                }
+                if(e.getClick().equals(ClickType.DOUBLE_CLICK)){
+                    e.setCancelled(true);
+                    return;
+                }
+            }
+        }
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                if(e.getWhoClicked().getOpenInventory().getTitle().contains("关于玩家")) {
+                    if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(0)).getItemMeta()).getLore()).size() == 1) {
+                        if (e.getRawSlot() < 0 || e.getRawSlot() >= e.getInventory().getSize()) {//如果在GUI外(背包)
+                            for (Pinv i : pinvlist) {
+                                i.upinfoinv();
+                            }
+                        } else {//在gui里面
+                            for (Pinv i : pinvlist) {
+                                i.downinfoinv();
+                            }
+                        }
+                    }
+                }
+                for(Pinv i : pinvlist){
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void OnDrop(PlayerDropItemEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for(Pinv i : pinvlist){
+                    i.upinfoinv();
+            }
+        }});
+    }
+    @EventHandler
+    public void OnPickup(PlayerPickupArrowEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void Onee(PlayerArmorStandManipulateEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void OnDemage(PlayerItemDamageEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void Onc(PlayerItemConsumeEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void Onww(PlayerItemMendEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void dhsua(PlayerSwapHandItemsEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void Onpick(EntityPickupItemEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void onchangemainhand(PlayerItemConsumeEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void moneychangers(PlayerGameModeChangeEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void OnWorld(PlayerChangedWorldEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void OnMove(PlayerItemHeldEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void Onove(PlayerMoveEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void OnTP(PlayerTeleportEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void Ond(InventoryDragEvent e){
+        if(e.getWhoClicked().getOpenInventory().getTitle().contains("关于玩家")) {
+            if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(0)).getItemMeta()).getLore()).size() == 1) {
+                e.setCancelled(true);
+            }
+        }
+    }
+    @EventHandler
+    public void OnDIE(PlayerRespawnEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void OnClose(InventoryCloseEvent e){
+        pinvlist.removeIf(i -> i.getOpener().equals(e.getPlayer()));
     }
 }

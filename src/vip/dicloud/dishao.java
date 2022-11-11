@@ -1,14 +1,16 @@
 package vip.dicloud;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.CachedServerIcon;
@@ -16,18 +18,152 @@ import org.bukkit.util.CachedServerIcon;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-import static vip.dicloud.dishao.config;
-import static vip.dicloud.dishao.motdl;
-import static vip.dicloud.dishao.motdt;
-import static vip.dicloud.dishao.icon;
-import static vip.dicloud.dishao.plugin;
+import static vip.dicloud.dishao.*;
 
+class Pinv{
+    Player player;
+    PlayerInventory playerInventory;
+    Player opener;
+    Inventory infoinv;
+    ItemStack mainhand;
+    public Pinv(Player player1,Player opener1){
+        opener = opener1;
+        player = player1;
+        playerInventory = player.getInventory();
+        infoinv = Bukkit.createInventory(player, 6 * 9, "关于玩家" + player.getName() + "的详情信息");
+        mainhand = playerInventory.getItemInMainHand();
+        ItemStack name = new ItemStack(Material.DIAMOND);
+        ItemMeta mm = name.getItemMeta();
+        mm.setLore(Arrays.asList(player.getName()));
+        mm.setDisplayName("玩家名称");
+        name.setItemMeta(mm);
+        infoinv.setItem(0,name);
+        ItemStack gamemode = new ItemStack(Material.DIAMOND);
+        if(player.getGameMode().equals(GameMode.CREATIVE)){
+            gamemode.setType(Material.GRASS_BLOCK);
+        } else if (player.getGameMode().equals(GameMode.SURVIVAL)) {
+            gamemode.setType(Material.IRON_SWORD);
+        }else if (player.getGameMode().equals(GameMode.ADVENTURE)) {
+            gamemode.setType(Material.PAPER);
+        }else{
+            gamemode.setType(Material.ENDER_EYE);
+        }
+        mm = gamemode.getItemMeta();
+        mm.setLore(Arrays.asList(player.getGameMode().toString()));
+        mm.setDisplayName("游戏模式");
+        gamemode.setItemMeta(mm);
+        infoinv.setItem(1,gamemode);
+        ItemStack world = new ItemStack(Material.STONE);
+        mm = world.getItemMeta();
+        mm.setLore(Arrays.asList(player.getWorld().getName()));
+        mm.setDisplayName("所在世界");
+        world.setItemMeta(mm);
+        infoinv.setItem(2,world);
+        for(int i = 9;i < 45;i++){
+            infoinv.setItem(i,this.getItem(i - 9));
+        }
+        infoinv.setItem(45,this.getPlayerInventory().getItemInMainHand());
+        infoinv.setItem(46,this.getPlayerInventory().getItemInOffHand());
+        infoinv.setItem(47,this.getPlayerInventory().getHelmet());
+        infoinv.setItem(48,this.getPlayerInventory().getChestplate());
+        infoinv.setItem(49,this.getPlayerInventory().getLeggings());
+        infoinv.setItem(50,this.getPlayerInventory().getBoots());
+        ItemStack loc = new ItemStack(Material.STRUCTURE_VOID);
+        mm = loc.getItemMeta();
+        mm.setLore(Arrays.asList(player.getLocation().getBlockX() + "",player.getLocation().getBlockY() + "",player.getLocation().getBlockZ() + "","点击传送至"));
+        mm.setDisplayName("位置");
+        loc.setItemMeta(mm);
+        infoinv.setItem(3,loc);
+        for(int i = 9;i < 45;i++){
+            infoinv.setItem(i,this.getItem(i - 9));
+        }
+        infoinv.setItem(45,this.getPlayerInventory().getItemInMainHand());
+        infoinv.setItem(46,this.getPlayerInventory().getItemInOffHand());
+        infoinv.setItem(47,this.getPlayerInventory().getHelmet());
+        infoinv.setItem(48,this.getPlayerInventory().getChestplate());
+        infoinv.setItem(49,this.getPlayerInventory().getLeggings());
+        infoinv.setItem(50,this.getPlayerInventory().getBoots());
+    }
+    public Player getPlayer(){
+        return player;
+    }
+    public PlayerInventory getPlayerInventory(){
+        return playerInventory;
+    }
+    public ItemStack getItem(int index){
+        return playerInventory.getItem(index);
+    }
+    public Player getOpener(){
+        return opener;
+    }
+    public Inventory getInfoinv(){
+        return infoinv;
+    }
+    public void setitem(int index,ItemStack i){
+        playerInventory.setItem(index,i);
+    }
+    public void upinfoinv(){
+        for(int i = 9;i < 45;i++){
+            infoinv.setItem(i,this.getItem(i - 9));
+        }
+        infoinv.setItem(45,this.getPlayerInventory().getItemInMainHand());
+        mainhand = infoinv.getItem(45);
+        infoinv.setItem(46,this.getPlayerInventory().getItemInOffHand());
+        infoinv.setItem(47,this.getPlayerInventory().getHelmet());
+        infoinv.setItem(48,this.getPlayerInventory().getChestplate());
+        infoinv.setItem(49,this.getPlayerInventory().getLeggings());
+        infoinv.setItem(50,this.getPlayerInventory().getBoots());
+        ItemStack gamemode = new ItemStack(Material.DIAMOND);
+        if(player.getGameMode().equals(GameMode.CREATIVE)){
+            gamemode.setType(Material.GRASS_BLOCK);
+        } else if (player.getGameMode().equals(GameMode.SURVIVAL)) {
+            gamemode.setType(Material.IRON_SWORD);
+        }else if (player.getGameMode().equals(GameMode.ADVENTURE)) {
+            gamemode.setType(Material.PAPER);
+        }else{
+            gamemode.setType(Material.ENDER_EYE);
+        }
+        ItemMeta mm = gamemode.getItemMeta();
+        mm.setLore(Arrays.asList(player.getGameMode().toString()));
+        mm.setDisplayName("游戏模式");
+        gamemode.setItemMeta(mm);
+        infoinv.setItem(1,gamemode);
+        ItemStack world = new ItemStack(Material.STONE);
+        mm = world.getItemMeta();
+        mm.setLore(Arrays.asList(player.getWorld().getName()));
+        mm.setDisplayName("所在世界");
+        world.setItemMeta(mm);
+        infoinv.setItem(2,world);
+        ItemStack loc = new ItemStack(Material.STRUCTURE_VOID);
+        mm = loc.getItemMeta();
+        mm.setLore(Arrays.asList(player.getLocation().getBlockX() + "",player.getLocation().getBlockY() + "",player.getLocation().getBlockZ() + "","点击传送至"));
+        mm.setDisplayName("位置");
+        loc.setItemMeta(mm);
+        infoinv.setItem(3,loc);
+    }
+    public void downinfoinv(){
+        for(int i = 0;i < 36;i++){
+            getPlayerInventory().setItem(i, getInfoinv().getItem(i + 9));
+        }
+        if(!Objects.equals(infoinv.getItem(playerInventory.getHeldItemSlot() + 9), mainhand)){
+            infoinv.setItem(45,infoinv.getItem(playerInventory.getHeldItemSlot() + 9));
+            mainhand = infoinv.getItem(playerInventory.getHeldItemSlot() + 9);
+        } else if (!Objects.equals(infoinv.getItem(45), mainhand)){
+            infoinv.setItem(playerInventory.getHeldItemSlot() + 9,infoinv.getItem(45));
+            mainhand = infoinv.getItem(45);
+        }
 
+        player.getInventory().setItemInMainHand(mainhand);
+        player.getInventory().setItemInOffHand(infoinv.getItem(46));
+        player.getInventory().setHelmet(infoinv.getItem(47));
+        player.getInventory().setChestplate(infoinv.getItem(48));
+        player.getInventory().setLeggings(infoinv.getItem(49));
+        player.getInventory().setBoots(infoinv.getItem(50));
+    }
+    public String getzhihzen(){return opener.getName() + "->" + player.getName();}
+}
 class Update{
     static String openFile(String filePath) {
         int HttpResult; // 服务器返回的状态
@@ -117,6 +253,7 @@ public class dishao extends JavaPlugin {
     static long motdt;
     static CachedServerIcon icon;
     static Plugin plugin;
+    static ArrayList<Pinv> pinvlist = new ArrayList<>();
     public void onEnable() {
         saveDefaultConfig();
         saveConfig();
@@ -208,6 +345,12 @@ public class dishao extends JavaPlugin {
         }
         if (Bukkit.getPluginCommand("dishao") != null) {
             Objects.requireNonNull(Bukkit.getPluginCommand("dishao")).setExecutor(new Info_Command());
+        }
+        if (Bukkit.getPluginCommand("playerinfo") != null) {
+            Objects.requireNonNull(Bukkit.getPluginCommand("playerinfo")).setExecutor(new playerinfo_Command());
+        }
+        if (Bukkit.getPluginCommand("playerinfolist") != null) {
+            Objects.requireNonNull(Bukkit.getPluginCommand("playerinfolist")).setExecutor(new playerinfolist_Command());
         }
         this.getServer().getPluginManager().registerEvents(new Lisener(), this);
         if(update) {
@@ -552,6 +695,57 @@ class Kick_command implements TabExecutor {
         return n;
     }
 }
+class playerinfo_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender,Command command, String label,String[] args){
+        if(commandSender instanceof Player){
+            Player player = (Player) commandSender;
+            if(player.hasPermission("dishao.playerinfo")){
+                if(args.length == 0){
+                    player.sendMessage("缺少参数:[玩家名称]!");
+                }else if(args.length > 1){
+                    player.sendMessage("错误:过多的参数!");
+                }else if(!new PPlayer().isplayer(args[0])){
+                    player.sendMessage(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
+                }else{
+                    Pinv pinv = new Pinv(Bukkit.getPlayer(args[0]),player);
+                    if(!pinvlist.contains(pinv)){
+                        pinvlist.add(pinv);
+                    }else{
+                        pinv = pinvlist.get(pinvlist.indexOf(pinv));
+                        pinvlist.add(pinv);
+                    }
+                    player.openInventory(pinv.getInfoinv());
+                }
+            }else{
+                player.sendMessage(ChatColor.DARK_RED + "你没有使用该指令的权限!");
+            }
+        }else{
+            if(args.length == 0){
+                new Bukkitio().saytoserver("缺少参数:[玩家名称]!");
+            }else if(args.length > 1){
+                new Bukkitio().saytoserver("错误:过多的参数!");
+            }else if(!new PPlayer().isplayer(args[0])){
+                new Bukkitio().saytoserver(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
+            }else{
+                new Bukkitio().saytoserver("玩家名称:" + args[0]);
+                new Bukkitio().saytoserver("游戏模式:" + Bukkit.getPlayer(args[0]).getGameMode().toString());
+                new Bukkitio().saytoserver("所在世界:" + Bukkit.getPlayer(args[0]).getWorld().getName());
+                new Bukkitio().saytoserver("位置:" + Bukkit.getPlayer(args[0]).getLocation().getBlockX() + "," + Bukkit.getPlayer(args[0]).getLocation().getBlockY() + "," + Bukkit.getPlayer(args[0]).getLocation().getBlockZ());
+            }
+        }
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        ArrayList<String> n = new ArrayList<>();
+        if(args.length == 1){
+            for(Player i : Bukkit.getOnlinePlayers()){
+                n.add(i.getName());
+            }
+        }return n;
+    }
+}
 class Info_Command implements TabExecutor {
     @Override
     @ParametersAreNonnullByDefault
@@ -851,6 +1045,53 @@ class Info_Command implements TabExecutor {
             return s;
         }
         List n = new ArrayList<>();
+        return n;
+    }
+}
+class playerinfolist_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(commandSender instanceof Player){
+            if(!commandSender.hasPermission("dishao.superuser")){
+                commandSender.sendMessage(ChatColor.DARK_RED + "你没有使用该指令的权限!");
+                return true;
+            }
+        }
+        if(args.length == 1){
+            for(Pinv i : pinvlist){
+                if(i.getzhihzen().equals(args[0])){
+                    i.getOpener().closeInventory();
+                    i.getOpener().sendMessage("你对" + i.getPlayer().getName() + "的查看被超级用户强制关闭!");
+                    pinvlist.remove(i);
+                    commandSender.sendMessage(ChatColor.DARK_GREEN + "成功关闭" + args[0] + "的详情链接");
+                    return true;
+                }
+            }
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:未找到相应的详情指针!");
+        }else if(args.length == 0){
+            commandSender.sendMessage(ChatColor.DARK_RED + "缺少参数:[详情指针]!");
+        }else{
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:过多的参数!");
+        }
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        ArrayList<String> n = new ArrayList<>();
+        if(args.length == 1) {
+            if (sender instanceof Player) {
+                Player player = (Player)sender;
+                if(!player.hasPermission("dishao.superuser")){
+                    n.add("非超级用户无法访问详情指针列表");
+                    return n;
+                }
+            }
+            if (pinvlist.size() >= 1) {
+                for (Pinv i : pinvlist) {
+                    n.add(i.getOpener().getName() + "->" + i.getPlayer().getName());
+                }
+            }
+        }
         return n;
     }
 }
