@@ -25,3 +25,7 @@ server-motd:
   load-print: true
   #图标
   motd-icon: favicon.png
+#超级用户
+superuser: ''
+#名字范围
+name-range: ^[A-Za-z\u4e00-\u9fa50-9_\-]+$

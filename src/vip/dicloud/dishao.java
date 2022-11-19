@@ -1053,7 +1053,7 @@ class playerinfolist_Command implements TabExecutor{
     @ParametersAreNonnullByDefault
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
         if(commandSender instanceof Player){
-            if(!commandSender.hasPermission("dishao.superuser")){
+            if(!commandSender.getName().equals(config.getString("superuser"))){
                 commandSender.sendMessage(ChatColor.DARK_RED + "你没有使用该指令的权限!");
                 return true;
             }
@@ -1081,7 +1081,7 @@ class playerinfolist_Command implements TabExecutor{
         if(args.length == 1) {
             if (sender instanceof Player) {
                 Player player = (Player)sender;
-                if(!player.hasPermission("dishao.superuser")){
+                if(!player.getName().equals(config.getString("superuser"))){
                     n.add("非超级用户无法访问详情指针列表");
                     return n;
                 }

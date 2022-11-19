@@ -12,6 +12,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static org.bukkit.Bukkit.getLogger;
 import static vip.dicloud.dishao.*;
@@ -32,37 +33,19 @@ public class Lisener implements org.bukkit.event.Listener {
             String s;
             for (int i = 0; i < c.size(); i++) {
                 s = (String) c.get(i);
-                if(!e.getPlayer().isOp() && !s.equals("dishao.superuser")){
-                    e.getPlayer().addAttachment((Plugin) dishao.getPlugin(dishao.class), s, true);
-                }
+                e.getPlayer().addAttachment((Plugin) dishao.getPlugin(dishao.class), s, true);
             }
             c = config.getList("off-permissions-list", null);
             for (int i = 0; i < c.size(); i++) {
                 s = (String) c.get(i);
                 if(!e.getPlayer().isOp() && !s.equals("dishao.superuser")) {
                     e.getPlayer().addAttachment((Plugin) dishao.getPlugin(dishao.class), s, false);
-                }else if(!config.getString("superuser","@").equals(e.getPlayer().getName())){
+                }else if(!config.getString("superuser","").equals(e.getPlayer().getName())){
                     e.getPlayer().addAttachment(plugin,"dishao.superuser",false);
                 }
             }
         }
-        boolean b = true;
-        String _name = e.getPlayer().getName();
-        for(byte _b : _name.getBytes()){
-            if(!Character.isLetter(_b)
-                    && !Character.isDigit(_b)
-                    && _b != '_'
-                    && _b != '-'){
-                b = false;
-                break;
-            }
-        }
-        if(b){
-            getLogger().info("true");
-        }else{
-            getLogger().info("false");
-        }
-        if(!b) {
+        if(!Pattern.compile(config.getString("name-range","^[A-Za-z\\u4e00-\\u9fa50-9_\\-]+$")).matcher(e.getPlayer().getName()).matches()) {
             new ti(e.getPlayer(), ChatColor.RED + "您的名字不符合服务器要求");
             e.setJoinMessage("");
             return;
