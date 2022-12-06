@@ -55,8 +55,8 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    dishao.main_command:  主命令的权限  
    dishao.main_command.config:  命令更改配置文件的权限  
    dishao.main_command.reload:  重载插件的权限
-   dishao.playerinfo: 打开玩家详情gui的权限
-   dishao.image: 获取图片地图的权限
+   dishao.playerinfo: 打开玩家详情gui的权限  
+   dishao.image: 获取图片地图的权限  
 3. 命令列表  
    /514:
    需要权限: "dishao.zisha"  
