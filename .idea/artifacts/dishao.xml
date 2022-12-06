@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="dishao">
-    <output-path>$PROJECT_DIR$/out/artifacts/dishao</output-path>
-    <root id="archive" name="dishao.jar">
-      <element id="module-output" name="dishao" />
-    </root>
-  </artifact>
-</component>
