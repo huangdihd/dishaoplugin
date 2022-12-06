@@ -1,42 +1,50 @@
 name: dishao
 main: vip.dicloud.dishao
-version: 1.10.2-R
+version: 1.11.1-R
 api-version: 1.16
 authors: [ DicloudStudio ]
 commands:
   zisha:
     permission: "dishao.zisha"
+    permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "514"
   help:
     permission: "dishao.help"
+    permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "help"
   tell:
     permission: "dishao.tell"
+    permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "w"
       - "tell"
       - "msg"
   out:
     permission: "dishao.out"
+    permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "out"
   tp:
     permission: "dishao.tp"
+    permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "tp"
   kick:
     permission: "dishao.kick"
+    permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "kick"
   dishao:
     permission: "dishao.main_command"
+    permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "dishao"
       - "ds"
   playerinfo:
     permission: "dishao.playerinfo"
+    permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "playerinfo"
       - "pi"
@@ -44,6 +52,12 @@ commands:
     aliases:
       - "playerinfolist"
       - "pil"
+  image:
+    permission: "dishao.image"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "image"
+      - "img"
 permissions:
   dishao.tp:
     description: Dishao plugins tp command
@@ -66,4 +80,6 @@ permissions:
   dishao.main_command.reload:
     description: Dishao plugins main_reload command
   dishao.playerinfo:
+    description: Dishao plugins main_reload command
+  dishao.image:
     description: Dishao plugins main_reload command

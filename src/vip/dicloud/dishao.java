@@ -6,20 +6,28 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.map.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.CachedServerIcon;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.List;
 
+import static org.bukkit.Bukkit.*;
 import static vip.dicloud.dishao.*;
 
 class Pinv{
@@ -32,7 +40,7 @@ class Pinv{
         opener = opener1;
         player = player1;
         playerInventory = player.getInventory();
-        infoinv = Bukkit.createInventory(player, 6 * 9, "关于玩家" + player.getName() + "的详情信息");
+        infoinv = createInventory(player, 6 * 9, "关于玩家" + player.getName() + "的详情信息");
         mainhand = playerInventory.getItemInMainHand();
         ItemStack name = new ItemStack(Material.DIAMOND);
         ItemMeta mm = name.getItemMeta();
@@ -224,7 +232,7 @@ class Bukkitio{
 }
 class PPlayer {
     public boolean isplayer(String s){
-        for(Player p1 : Bukkit.getOnlinePlayers()){
+        for(Player p1 : getOnlinePlayers()){
             if(p1.getName().equals(s)){
                 return true;
             }
@@ -254,6 +262,8 @@ public class dishao extends JavaPlugin {
     static CachedServerIcon icon;
     static Plugin plugin;
     static ArrayList<Pinv> pinvlist = new ArrayList<>();
+    static String OBC;
+    static String NMS;
     public void onEnable() {
         saveDefaultConfig();
         saveConfig();
@@ -302,6 +312,15 @@ public class dishao extends JavaPlugin {
                 throw new RuntimeException(e);
             }
         }
+        if(!new File(getDataFolder().getAbsolutePath() + File.separator + "PlayerData").exists()) {
+            new File(getDataFolder().getAbsolutePath() + File.separator + "PlayerData").mkdir();
+        }
+        if(!new File(getDataFolder().getAbsolutePath() + File.separator + "image").exists()) {
+            new File(getDataFolder().getAbsolutePath() + File.separator + "image").mkdir();
+        }
+        if(!new File(getDataFolder().getAbsolutePath() + File.separator + "ImageData").exists()) {
+            new File(getDataFolder().getAbsolutePath() + File.separator + "ImageData").mkdir();
+        }
         motdt = config.getLong("server-motd.motd-time", 3000L);
         motdl = (ArrayList<String>) config.getList("server-motd.motd-list");
         new Thread(() -> {
@@ -324,33 +343,78 @@ public class dishao extends JavaPlugin {
                 }
             }
         }).start();
+        String[] versions = Bukkit.getVersion().split("\\.");
+        String major = versions[0];
+        String minor = versions[1];
+        String revision = "-1";
+        String NMSBaseHead = "net.minecraft.server.v" + major + "_" + minor + "_R";
+        for (int i = 1; i <= 9; i++) {
+            String versionTest = NMSBaseHead + i;
+            try {
+                Class.forName(versionTest + ".ItemStack");
+                revision = i + "";
+                break;
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        if(Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()).length != 0){
+            for(File i : new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()){
+                MapView map =  Bukkit.getMap(YamlConfiguration.loadConfiguration(i).getInt("id"));
+                for(MapRenderer j : map.getRenderers()){
+                    map.removeRenderer(j);
+                }
+                map.addRenderer(new MapRenderer() {
+                    @Override
+                    public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
+                        try {
+                            String filename = YamlConfiguration.loadConfiguration(i).getString("image");
+                            BufferedImage image =  ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename));
+                            mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }
+        getLogger().info("成功获取" + Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()).length + "个地图的图片数据!");
+        OBC = "org.bukkit.craftbukkit.v" + major + "_" + minor + "_R" + revision;
+        NMS = "net.minecraft.server.v" + major + "_" + minor + "_R" + revision;
+        if(!revision.equals("-1")){
+            getLogger().info("经过反射,您的minecraft版本为" + NMSBaseHead + revision + "!");
+        }else{
+            getLogger().info("反射获取失败!");
+        }
         getLogger().info(s);
-        if (Bukkit.getPluginCommand("zisha") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("zisha")).setExecutor(new Kill_Command());
+        if (getPluginCommand("zisha") != null) {
+            Objects.requireNonNull(getPluginCommand("zisha")).setExecutor(new Kill_Command());
         }
-        if (Bukkit.getPluginCommand("help") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("help")).setExecutor(new Help_Command());
+        if (getPluginCommand("help") != null) {
+            Objects.requireNonNull(getPluginCommand("help")).setExecutor(new Help_Command());
         }
-        if (Bukkit.getPluginCommand("tell") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("tell")).setExecutor(new Tell_Command());
+        if (getPluginCommand("tell") != null) {
+            Objects.requireNonNull(getPluginCommand("tell")).setExecutor(new Tell_Command());
         }
-        if (Bukkit.getPluginCommand("out") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("out")).setExecutor(new Out_command());
+        if (getPluginCommand("out") != null) {
+            Objects.requireNonNull(getPluginCommand("out")).setExecutor(new Out_command());
         }
-        if (Bukkit.getPluginCommand("tp") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("tp")).setExecutor(new Tp_command());
+        if (getPluginCommand("tp") != null) {
+            Objects.requireNonNull(getPluginCommand("tp")).setExecutor(new Tp_command());
         }
-        if (Bukkit.getPluginCommand("kick") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("kick")).setExecutor(new Kick_command());
+        if (getPluginCommand("kick") != null) {
+            Objects.requireNonNull(getPluginCommand("kick")).setExecutor(new Kick_command());
         }
-        if (Bukkit.getPluginCommand("dishao") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("dishao")).setExecutor(new Info_Command());
+        if (getPluginCommand("dishao") != null) {
+            Objects.requireNonNull(getPluginCommand("dishao")).setExecutor(new Info_Command());
         }
-        if (Bukkit.getPluginCommand("playerinfo") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("playerinfo")).setExecutor(new playerinfo_Command());
+        if (getPluginCommand("playerinfo") != null) {
+            Objects.requireNonNull(getPluginCommand("playerinfo")).setExecutor(new playerinfo_Command());
         }
-        if (Bukkit.getPluginCommand("playerinfolist") != null) {
-            Objects.requireNonNull(Bukkit.getPluginCommand("playerinfolist")).setExecutor(new playerinfolist_Command());
+        if (getPluginCommand("playerinfolist") != null) {
+            Objects.requireNonNull(getPluginCommand("playerinfolist")).setExecutor(new playerinfolist_Command());
+        }
+        if (getPluginCommand("image") != null) {
+            Objects.requireNonNull(getPluginCommand("image")).setExecutor(new image_Command());
         }
         this.getServer().getPluginManager().registerEvents(new Lisener(), this);
         if(update) {
@@ -462,10 +526,10 @@ class Tell_Command implements TabExecutor {
             }
             PPlayer pPlayer = new PPlayer();
             if (pPlayer.isplayer(args[0]) || args[0].toLowerCase().equals("server")) {
-                Player player2 = (Player) Bukkit.getPlayer(args[0]);
+                Player player2 = (Player) getPlayer(args[0]);
                 if ((commandSender instanceof Player) || (!args[0].toLowerCase().equals("server"))) {
                     if(commandSender instanceof Player){
-                        if((Player)commandSender == Bukkit.getPlayer(args[0])){
+                        if((Player)commandSender == getPlayer(args[0])){
                             new Bukkitio().commandsay(commandSender,"错误:不能给自己发私聊!");
                             return true;
                         }
@@ -511,7 +575,7 @@ class Tell_Command implements TabExecutor {
             }
         }else if(args.length == 1){
             List<String> l = new ArrayList();
-            for(Player i : Bukkit.getOnlinePlayers()){
+            for(Player i : getOnlinePlayers()){
                 if(i != (Player)sender) {
                     l.add(i.getName());
                 }
@@ -554,10 +618,10 @@ class Tp_command implements CommandExecutor {
         }
         if(args.length == 1 || args.length == 3){
             if(args.length == 1){
-                Player p = Bukkit.getPlayer(args[0]);
+                Player p = getPlayer(args[0]);
                 PPlayer pPlayer = new PPlayer();
                 if(pPlayer.isplayer(args[0])){
-                    player.teleport(new Location(Bukkit.getPlayer(args[0]).getWorld(), Bukkit.getPlayer(args[0]).getLocation().getBlockX(), Bukkit.getPlayer(args[0]).getLocation().getBlockY(), Bukkit.getPlayer(args[0]).getLocation().getBlockZ()));
+                    player.teleport(new Location(getPlayer(args[0]).getWorld(), getPlayer(args[0]).getLocation().getBlockX(), getPlayer(args[0]).getLocation().getBlockY(), getPlayer(args[0]).getLocation().getBlockZ()));
                     return true;
                 }
                 boolean l = true;
@@ -648,7 +712,7 @@ class Kick_command implements TabExecutor {
         }
         Player player = (Player) commandSender;
         if(args.length == 2){
-            Player p = Bukkit.getPlayer(args[0]);
+            Player p = getPlayer(args[0]);
             PPlayer pPlayer = new PPlayer();
             if(pPlayer.isplayer(args[0])){
                 new ti(p,args[1]);
@@ -686,7 +750,7 @@ class Kick_command implements TabExecutor {
             }
         }else if(args.length == 1){
             List<String> l = new ArrayList();
-            for(Player i : Bukkit.getOnlinePlayers()){
+            for(Player i : getOnlinePlayers()){
                 l.add(i.getName());
             }
             return l;
@@ -709,7 +773,7 @@ class playerinfo_Command implements TabExecutor{
                 }else if(!new PPlayer().isplayer(args[0])){
                     player.sendMessage(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
                 }else{
-                    Pinv pinv = new Pinv(Bukkit.getPlayer(args[0]),player);
+                    Pinv pinv = new Pinv(getPlayer(args[0]),player);
                     if(!pinvlist.contains(pinv)){
                         pinvlist.add(pinv);
                     }else{
@@ -730,9 +794,9 @@ class playerinfo_Command implements TabExecutor{
                 new Bukkitio().saytoserver(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
             }else{
                 new Bukkitio().saytoserver("玩家名称:" + args[0]);
-                new Bukkitio().saytoserver("游戏模式:" + Bukkit.getPlayer(args[0]).getGameMode().toString());
-                new Bukkitio().saytoserver("所在世界:" + Bukkit.getPlayer(args[0]).getWorld().getName());
-                new Bukkitio().saytoserver("位置:" + Bukkit.getPlayer(args[0]).getLocation().getBlockX() + "," + Bukkit.getPlayer(args[0]).getLocation().getBlockY() + "," + Bukkit.getPlayer(args[0]).getLocation().getBlockZ());
+                new Bukkitio().saytoserver("游戏模式:" + getPlayer(args[0]).getGameMode().toString());
+                new Bukkitio().saytoserver("所在世界:" + getPlayer(args[0]).getWorld().getName());
+                new Bukkitio().saytoserver("位置:" + getPlayer(args[0]).getLocation().getBlockX() + "," + getPlayer(args[0]).getLocation().getBlockY() + "," + getPlayer(args[0]).getLocation().getBlockZ());
             }
         }
         return true;
@@ -740,7 +804,7 @@ class playerinfo_Command implements TabExecutor{
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         ArrayList<String> n = new ArrayList<>();
         if(args.length == 1){
-            for(Player i : Bukkit.getOnlinePlayers()){
+            for(Player i : getOnlinePlayers()){
                 n.add(i.getName());
             }
         }return n;
@@ -910,7 +974,7 @@ class Info_Command implements TabExecutor {
                 }
                 boolean per = config.getBoolean("permissions",true);
                 if (per) {
-                    for(Player p : Bukkit.getOnlinePlayers()) {
+                    for(Player p : getOnlinePlayers()) {
                         p.recalculatePermissions();
                     }
                 }
@@ -932,7 +996,7 @@ class Info_Command implements TabExecutor {
                 motdl = (ArrayList<String>) dishao.getPlugin(dishao.class).getConfig().getList("server-motd.motd-list");
                 motdt = config.getLong("server-motd.motd-time",3000L);
                 per = config.getBoolean("permissions",true);
-                for(Player p : Bukkit.getOnlinePlayers()) {
+                for(Player p : getOnlinePlayers()) {
                     if (per) {
                         List c = config.getList("permissions-list", null);
                         String s;
@@ -1091,6 +1155,83 @@ class playerinfolist_Command implements TabExecutor{
                     n.add(i.getOpener().getName() + "->" + i.getPlayer().getName());
                 }
             }
+        }
+        return n;
+    }
+}
+class image_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(commandSender instanceof Player) {
+            if (args.length == 1) {
+                List imagel = new ArrayList<String>();
+                if(Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image").listFiles()).length == 0){
+                    commandSender.sendMessage("错误:无效的图片名!");
+                    return true;
+                }
+                for(File i : new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image").listFiles()){
+                    imagel.add(i.getName());
+                }
+                if(!imagel.contains(args[0])){
+                    commandSender.sendMessage("错误:无效的图片名!");
+                    return true;
+                }
+                Player player = (Player) commandSender;
+                MapView map = Bukkit.createMap(player.getWorld());
+                BufferedImage image;
+                try {
+                    image = ImageIO.read(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + args[0]));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                for (MapRenderer renderer : map.getRenderers()) {
+                    map.removeRenderer(renderer);
+                }
+                map.addRenderer(new MapRenderer() {
+                    @Override
+                    public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
+                        mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
+                    }
+                });
+                ItemStack item = new ItemStack(Material.FILLED_MAP);
+                MapMeta meta = (MapMeta)item.getItemMeta();
+                File mcf = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData" + File.separator + map.getId() + ".yml");
+                try {
+                    mcf.createNewFile();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                FileConfiguration mc = YamlConfiguration.loadConfiguration(mcf);
+                mc.set("id",map.getId());
+                mc.set("image",args[0]);
+                try {
+                    mc.save(mcf);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                assert meta != null;
+                meta.setMapView(map);
+                item.setItemMeta(meta);
+                player.getInventory().addItem(item);
+            } else if (args.length == 0) {
+                commandSender.sendMessage(ChatColor.DARK_RED + "缺少参数:[图片名]!");
+            } else {
+                commandSender.sendMessage(ChatColor.DARK_RED + "错误:过多的参数!");
+            }
+        }else {
+            commandSender.sendMessage("非玩家不能使用该命令!");
+        }
+        return true;
+
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        ArrayList<String> n = new ArrayList<>();
+        if(Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image").listFiles()).length == 0){
+            return n;
+        }
+        for(File i : new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image").listFiles()){
+            n.add(i.getName());
         }
         return n;
     }

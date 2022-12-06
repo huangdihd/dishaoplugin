@@ -107,7 +107,13 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    命令名字:  
    \- "dishao"  
    \- "ds"  
-   命令详情: 主命令,若没有参数或只有一个参数"info"则输出插件详情(需要权限"dishao.main_command.info"),若第一个参数是"reload"则重载插件(需要权限"dishao.main_command.reload"),若第一个参数是"config"更改配置文件,若第二个参数是数组,第三个参数输入"add"或者"remove",然后输入值来修改,若第二个参数是布尔类型变量,则第三个参数输入"true"或"false"(改完后不会立刻重载,需要权限"dishao.main_command.reload",所有主命令只要有权限"dishao.main_command都可以执行")
+   命令详情: 主命令,若没有参数或只有一个参数"info"则输出插件详情(需要权限"dishao.main_command.info"),若第一个参数是"reload"则重载插件(需要权限"dishao.main_command.reload"),若第一个参数是"config"更改配置文件,若第二个参数是数组,第三个参数输入"add"或者"remove",然后输入值来修改,若第二个参数是布尔类型变量,则第三个参数输入"true"或"false"(改完后不会立刻重载,需要权限"dishao.main_command.reload",所有主命令只要有权限"dishao.main_command都可以执行")  
+   /image:  
+   需要权限:"dishao.image"
+   命令名字:  
+   \- "image"  
+   \- "img"  
+   命令详情: 将图片放在服务器根目录/plugin/dishao/image,输入/image [图片文件名],你就会获得一个印有选定图像的地图,128x128,如果不是正方形会进行拉伸.
 # 详情界面详情
 ## GUI界面
 当打开一个玩家的详情界面时,会产生一个Pinv对象。其中包含Opener(打开者),player(被打开者)  
@@ -128,7 +134,15 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
 当player退出游戏或Opener关闭详情界面后,Pinv对象将被删除
 ## 详情链接
 每个Pinv对象都会有一个详情链接,它的构造是这样的:[Opener的名字]->[player的名字]  
-当超级用户使用/playerinfolist 强制关闭后,会删除对应的Pinv对象并且对Opener说:你对[player的名字]的查看被超级用户强制关闭!
+当超级用户使用/playerinfolist 强制关闭后,会删除对应的Pinv对象并且对Opener说:你对[player的名字]的查看被超级用户强制关闭!  
+
+# 各个文件夹的作用
+## PlayerData
+顾名思义,存放了每个登陆过玩家的名字,uuid,最后一次登录ip,血量,游戏模式,是否为op
+## ImageData
+储存每个地图对应图片的文件,请尽量不要删除,否则后果不堪设想!
+## image
+储存需要在地图上出现的图片,如果你使用了文件夹内的文件,请不要再将它删除,否则服务端可能会不停的报错!
 # 参与贡献
 
 DicloudStudio

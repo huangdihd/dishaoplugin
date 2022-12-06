@@ -2,6 +2,8 @@ package vip.dicloud;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -10,6 +12,8 @@ import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -50,11 +54,48 @@ public class Lisener implements org.bukkit.event.Listener {
             e.setJoinMessage("");
             return;
         }
+        File PlayerData = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData");
+        boolean b = false;
+        if(PlayerData.listFiles().length != 0) {
+            for (File i : PlayerData.listFiles()){
+                FileConfiguration playerconfig = YamlConfiguration.loadConfiguration(i);
+                    if(i.getName().equals(e.getPlayer().getName() + ".yml")){
+                        playerconfig.set("name",e.getPlayer().getName());
+                        playerconfig.set("uuid",e.getPlayer().getUniqueId().toString());
+                        playerconfig.set("last-ip",Objects.requireNonNull(e.getPlayer().getAddress()).getHostString());
+                        playerconfig.set("health", e.getPlayer().getHealth());
+                        playerconfig.set("gamemode", e.getPlayer().getGameMode().toString());
+                        playerconfig.set("isop",e.getPlayer().isOp());
+                        b = true;
+                        break;
+                }
+            }
+        }
+        if(!b){
+            File file = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + File.separator + e.getPlayer().getName() + ".yml");
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            FileConfiguration pc = YamlConfiguration.loadConfiguration(file);
+            pc.set("name",e.getPlayer().getName());
+            pc.set("uuid",e.getPlayer().getUniqueId().toString());
+            pc.set("last-ip",Objects.requireNonNull(e.getPlayer().getAddress()).getHostString());
+            pc.set("health", e.getPlayer().getHealth());
+            pc.set("gamemode", e.getPlayer().getGameMode().toString());
+            pc.set("isop",e.getPlayer().isOp());
+            try {
+                pc.save(file);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
         e.setJoinMessage(ChatColor.BLUE + "玩家" + e.getPlayer().getName() + "加入了游戏!");
         Bukkit.getScheduler().runTask(plugin, new Runnable() {
             @Override
             public void run() {
-                if(config.getString("superuser","@").equals(e.getPlayer().getName())){
+                if(config.getString("superuser","").equals(e.getPlayer().getName())){
                     e.getPlayer().sendMessage(ChatColor.DARK_GREEN + "欢迎到来,超级用户");
                     if(!e.getPlayer().isOp()){
                         e.getPlayer().setOp(true);
