@@ -110,11 +110,48 @@ public class Lisener implements org.bukkit.event.Listener {
     }
     @EventHandler
     public void QuitMessage(PlayerQuitEvent e) {
+        File PlayerData = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData");
+        boolean b = false;
+        if(PlayerData.listFiles().length != 0) {
+            for (File i : PlayerData.listFiles()){
+                FileConfiguration playerconfig = YamlConfiguration.loadConfiguration(i);
+                if(i.getName().equals(e.getPlayer().getName() + ".yml")){
+                    playerconfig.set("name",e.getPlayer().getName());
+                    playerconfig.set("uuid",e.getPlayer().getUniqueId().toString());
+                    playerconfig.set("last-ip",Objects.requireNonNull(e.getPlayer().getAddress()).getHostString());
+                    playerconfig.set("health", e.getPlayer().getHealth());
+                    playerconfig.set("gamemode", e.getPlayer().getGameMode().toString());
+                    playerconfig.set("isop",e.getPlayer().isOp());
+                    b = true;
+                    break;
+                }
+            }
+        }
+        if(!b){
+            File file = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + File.separator + e.getPlayer().getName() + ".yml");
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            FileConfiguration pc = YamlConfiguration.loadConfiguration(file);
+            pc.set("name",e.getPlayer().getName());
+            pc.set("uuid",e.getPlayer().getUniqueId().toString());
+            pc.set("last-ip",Objects.requireNonNull(e.getPlayer().getAddress()).getHostString());
+            pc.set("health", e.getPlayer().getHealth());
+            pc.set("gamemode", e.getPlayer().getGameMode().toString());
+            pc.set("isop",e.getPlayer().isOp());
+            try {
+                pc.save(file);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
         boolean per = config.getBoolean("permissions", true);
         if (per) {
             e.getPlayer().recalculatePermissions();
         }
-        boolean b = true;
+        b = true;
         String _name = e.getPlayer().getName();
         for (byte _b : _name.getBytes()) {
             if (!Character.isLetter(_b)
