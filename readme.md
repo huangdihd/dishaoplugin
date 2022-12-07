@@ -35,7 +35,7 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    motd-list:  
    \- 第一行%nl%第二行  
    \#每个标题等待时间  
-   motd-time: 3000L  
+   motd-time: 3000  
    \#加载标题输出  
    load-print: true  
    \#图标  
