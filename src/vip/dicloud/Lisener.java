@@ -1,5 +1,7 @@
 package vip.dicloud;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -9,13 +11,19 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
-import org.bukkit.event.server.ServerListPingEvent;
+import org.bukkit.event.server.*;
+import org.bukkit.permissions.ServerOperator;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static org.bukkit.Bukkit.getLogger;
@@ -56,6 +64,33 @@ public class Lisener implements org.bukkit.event.Listener {
         }
         File PlayerData = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData");
         boolean b = false;
+        boolean isonline = false;
+        String playerName = e.getPlayer().getName();
+        if(config.getBoolean("player-online-check",false)) {
+            try {
+                URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + playerName);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setUseCaches(false);
+                connection.setConnectTimeout(2500);
+                connection.setReadTimeout(2500);
+                connection.connect();
+
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = connection.getInputStream();
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                    JsonObject jsonObject = new JsonParser().parse(inputStreamReader).getAsJsonObject();
+                    UUID playerUUID = UUID.fromString(jsonObject.get("id").getAsString().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
+                    isonline = e.getPlayer().getUniqueId().equals(playerUUID);
+                    //e.getPlayer().sendMessage(ChatColor.BLUE + playerUUID.toString() + ChatColor.GREEN + e.getPlayer().getUniqueId() + ChatColor.YELLOW + isonline);
+                } else {
+                    isonline = false;
+                }
+            } catch (Exception E) {
+                E.printStackTrace();
+            }
+        }
         if(PlayerData.listFiles().length != 0) {
             for (File i : PlayerData.listFiles()){
                 FileConfiguration playerconfig = YamlConfiguration.loadConfiguration(i);
@@ -63,10 +98,13 @@ public class Lisener implements org.bukkit.event.Listener {
                         playerconfig.set("name",e.getPlayer().getName());
                         playerconfig.set("uuid",e.getPlayer().getUniqueId().toString());
                         playerconfig.set("last-ip",Objects.requireNonNull(e.getPlayer().getAddress()).getHostString());
-                        playerconfig.set("health", e.getPlayer().getHealth());
-                        playerconfig.set("gamemode", e.getPlayer().getGameMode().toString());
-                        playerconfig.set("isop",e.getPlayer().isOp());
+                        playerconfig.set("isonline",isonline);
                         b = true;
+                        try {
+                            playerconfig.save(new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + "\\" + e.getPlayer().getName() + ".yml"));
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         break;
                 }
             }
@@ -82,9 +120,7 @@ public class Lisener implements org.bukkit.event.Listener {
             pc.set("name",e.getPlayer().getName());
             pc.set("uuid",e.getPlayer().getUniqueId().toString());
             pc.set("last-ip",Objects.requireNonNull(e.getPlayer().getAddress()).getHostString());
-            pc.set("health", e.getPlayer().getHealth());
-            pc.set("gamemode", e.getPlayer().getGameMode().toString());
-            pc.set("isop",e.getPlayer().isOp());
+            pc.set("isonline",isonline);
             try {
                 pc.save(file);
             } catch (IOException ex) {
@@ -110,48 +146,11 @@ public class Lisener implements org.bukkit.event.Listener {
     }
     @EventHandler
     public void QuitMessage(PlayerQuitEvent e) {
-        File PlayerData = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData");
-        boolean b = false;
-        if(PlayerData.listFiles().length != 0) {
-            for (File i : PlayerData.listFiles()){
-                FileConfiguration playerconfig = YamlConfiguration.loadConfiguration(i);
-                if(i.getName().equals(e.getPlayer().getName() + ".yml")){
-                    playerconfig.set("name",e.getPlayer().getName());
-                    playerconfig.set("uuid",e.getPlayer().getUniqueId().toString());
-                    playerconfig.set("last-ip",Objects.requireNonNull(e.getPlayer().getAddress()).getHostString());
-                    playerconfig.set("health", e.getPlayer().getHealth());
-                    playerconfig.set("gamemode", e.getPlayer().getGameMode().toString());
-                    playerconfig.set("isop",e.getPlayer().isOp());
-                    b = true;
-                    break;
-                }
-            }
-        }
-        if(!b){
-            File file = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + File.separator + e.getPlayer().getName() + ".yml");
-            try {
-                file.createNewFile();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            FileConfiguration pc = YamlConfiguration.loadConfiguration(file);
-            pc.set("name",e.getPlayer().getName());
-            pc.set("uuid",e.getPlayer().getUniqueId().toString());
-            pc.set("last-ip",Objects.requireNonNull(e.getPlayer().getAddress()).getHostString());
-            pc.set("health", e.getPlayer().getHealth());
-            pc.set("gamemode", e.getPlayer().getGameMode().toString());
-            pc.set("isop",e.getPlayer().isOp());
-            try {
-                pc.save(file);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
         boolean per = config.getBoolean("permissions", true);
         if (per) {
             e.getPlayer().recalculatePermissions();
         }
-        b = true;
+        boolean b = true;
         String _name = e.getPlayer().getName();
         for (byte _b : _name.getBytes()) {
             if (!Character.isLetter(_b)
@@ -197,7 +196,7 @@ public class Lisener implements org.bukkit.event.Listener {
     @EventHandler
     public void Onchangeinv(InventoryClickEvent e){
         if(e.getWhoClicked().getOpenInventory().getTitle().contains("关于玩家")) {
-            if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(0)).getItemMeta()).getLore()).size() == 1) {
+            if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(1)).getItemMeta()).getLore()).size() == 1) {
                 if(e.getRawSlot() == 3){
                     for(Pinv i : pinvlist){
                         if(Objects.equals(i.getInfoinv(),e.getWhoClicked().getOpenInventory().getTopInventory())){
@@ -224,7 +223,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 if(e.getWhoClicked().getOpenInventory().getTitle().contains("关于玩家")) {
-                    if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(0)).getItemMeta()).getLore()).size() == 1) {
+                    if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(1)).getItemMeta()).getLore()).size() == 1) {
                         if (e.getRawSlot() < 0 || e.getRawSlot() >= e.getInventory().getSize()) {//如果在GUI外(背包)
                             for (Pinv i : pinvlist) {
                                 i.upinfoinv();
@@ -398,13 +397,24 @@ public class Lisener implements org.bukkit.event.Listener {
     @EventHandler
     public void Ond(InventoryDragEvent e){
         if(e.getWhoClicked().getOpenInventory().getTitle().contains("关于玩家")) {
-            if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(0)).getItemMeta()).getLore()).size() == 1) {
+            if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(1)).getItemMeta()).getLore()).size() == 1) {
                 e.setCancelled(true);
             }
         }
     }
     @EventHandler
     public void OnDIE(PlayerRespawnEvent e){
+        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Pinv i : pinvlist) {
+                    i.upinfoinv();
+                }
+            }
+        });
+    }
+    @EventHandler
+    public void Ons(PlayerToggleSneakEvent e){
         Bukkit.getScheduler().runTask(plugin, new Runnable() {
             @Override
             public void run() {

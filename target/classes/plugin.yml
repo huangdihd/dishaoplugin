@@ -1,6 +1,6 @@
 name: dishao
 main: vip.dicloud.dishao
-version: 1.11.1-R
+version: 1.11.2-B
 api-version: 1.16
 authors: [ DicloudStudio ]
 commands:
@@ -82,4 +82,6 @@ permissions:
   dishao.playerinfo:
     description: Dishao plugins main_reload command
   dishao.image:
+    description: Dishao plugins main_reload command
+  dishao.tpa:
     description: Dishao plugins main_reload command

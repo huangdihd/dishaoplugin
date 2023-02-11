@@ -29,3 +29,5 @@ server-motd:
 superuser: ''
 #名字范围
 name-range: ^[A-Za-z\u4e00-\u9fa50-9_\-]+$
+#正版验证查询请在网络通畅的情况下开启
+player-online-check: false
