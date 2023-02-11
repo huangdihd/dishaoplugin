@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +31,7 @@ import static org.bukkit.Bukkit.*;
 import static vip.dicloud.dishao.*;
 
 class Pinv{
+    Boolean isonline;
     Player player;
     PlayerInventory playerInventory;
     Player opener;
@@ -38,13 +40,24 @@ class Pinv{
     public Pinv(Player player1,Player opener1){
         opener = opener1;
         player = player1;
+        File PlayerData = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + "\\" + player.getName() + ".yml");
+        isonline = YamlConfiguration.loadConfiguration(PlayerData).getBoolean("isonline");
         playerInventory = player.getInventory();
         infoinv = createInventory(player, 6 * 9, "关于玩家" + player.getName() + "的详情信息");
         mainhand = playerInventory.getItemInMainHand();
-        ItemStack name = new ItemStack(Material.DIAMOND);
+        ItemStack name = new ItemStack(Material.PLAYER_HEAD);
+        if(isonline) {
+            SkullMeta meta = (SkullMeta) name.getItemMeta();
+            meta.setOwner(player.getName());
+            name.setItemMeta(meta);
+        }
         ItemMeta mm = name.getItemMeta();
-        mm.setLore(Arrays.asList(player.getName()));
-        mm.setDisplayName("玩家名称");
+        if(isonline){
+            mm.setLore(Arrays.asList(player.getName(),ChatColor.GREEN + "正版验证"));
+        }else{
+            mm.setLore(Arrays.asList(player.getName(),ChatColor.DARK_BLUE + "离线验证"));
+        }
+        mm.setDisplayName("玩家详情");
         name.setItemMeta(mm);
         infoinv.setItem(0,name);
         ItemStack gamemode = new ItemStack(Material.DIAMOND);
@@ -216,19 +229,31 @@ class Update{
         return  ee;
     }
 }
-class Bukkitio{
-    public void commandsay(CommandSender commandsender,String n){
-        if(!(commandsender instanceof Player)){
-            JavaPlugin.getPlugin(dishao.class).getLogger().info(n);
-        }else{
-            Player player = (Player)commandsender;
-            player.sendMessage(n);
+class Bukkitio {
+    // 定义一个用于向指定玩家或者控制台发送消息的方法
+    public void commandsay(CommandSender commandsender, String n) {
+        // 如果 commandsender 参数不是一个 Player 类型的对象
+        if (!(commandsender instanceof Player)) {
+            // 调用 JavaPlugin.getPlugin 函数来获取一个 dishao.class 类型的对象
+            JavaPlugin plugin = JavaPlugin.getPlugin(dishao.class);
+            // 使用该对象的 getLogger 方法来打印 n 参数
+            plugin.getLogger().info(n);
+        }
+        // 否则，如果 commandsender 参数是一个 Player 类型的对象
+        else {
+            // 向该玩家发送一条消息，内容为 n 参数
+            ((Player) commandsender).sendMessage(n);
         }
     }
-    public void saytoserver(String n){
+
+    // 定义一个用于向服务器控制台打印消息的方法
+    public void saytoserver(String n) {
+        // 调用 println 方法来打印 n 参数
         System.out.println(n);
     }
 }
+
+
 class PPlayer {
     public boolean isplayer(String s){
         for(Player p1 : getOnlinePlayers()){
@@ -796,6 +821,7 @@ class playerinfo_Command implements TabExecutor{
                 new Bukkitio().saytoserver("游戏模式:" + getPlayer(args[0]).getGameMode().toString());
                 new Bukkitio().saytoserver("所在世界:" + getPlayer(args[0]).getWorld().getName());
                 new Bukkitio().saytoserver("位置:" + getPlayer(args[0]).getLocation().getBlockX() + "," + getPlayer(args[0]).getLocation().getBlockY() + "," + getPlayer(args[0]).getLocation().getBlockZ());
+                new Bukkitio().saytoserver("正版验证:" + YamlConfiguration.loadConfiguration(new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + File.separator + args[0] + ".yml")).getBoolean("isonline"));
             }
         }
         return true;
@@ -1012,6 +1038,26 @@ class Info_Command implements TabExecutor {
                                 p.addAttachment((Plugin) dishao.getPlugin(dishao.class), s, false);
                             }
                         }
+                    }
+                }
+                if(Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()).length != 0){
+                    for(File i : new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()){
+                        MapView map =  Bukkit.getMap(YamlConfiguration.loadConfiguration(i).getInt("id"));
+                        for(MapRenderer j : map.getRenderers()){
+                            map.removeRenderer(j);
+                        }
+                        map.addRenderer(new MapRenderer() {
+                            @Override
+                            public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
+                                try {
+                                    String filename = YamlConfiguration.loadConfiguration(i).getString("image");
+                                    BufferedImage image =  ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename));
+                                    mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
                 }
                 new Bukkitio().commandsay(commandSender,"插件已重载");

@@ -6,7 +6,7 @@
 
     <groupId>vip.dicloud</groupId>
     <artifactId>dishao</artifactId>
-    <version>1.9-R</version>
+    <version>1.11-R</version>
     <packaging>jar</packaging>
 
     <name>dishao</name>
