@@ -31,3 +31,9 @@ superuser: ''
 name-range: ^[A-Za-z\u4e00-\u9fa50-9_\-]+$
 #正版验证查询请在网络通畅的情况下开启
 player-online-check: false
+#进入游戏的消息("%player%"表示玩家名字)
+join-message: §9玩家%player%加入了游戏!
+#退出游戏的消息("%player%"表示玩家名字)
+quit-message: §c玩家%player%退出了游戏!
+#正版玩家的前缀(没有请用双引号代替,只对tab列表和聊天栏有效)
+online-player-prefix: §a[正版玩家]§r
