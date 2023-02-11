@@ -40,7 +40,7 @@ class Pinv{
     public Pinv(Player player1,Player opener1){
         opener = opener1;
         player = player1;
-        File PlayerData = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + "\\" + player.getName() + ".yml");
+        File PlayerData = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + File.separator + player.getName() + ".yml");
         isonline = YamlConfiguration.loadConfiguration(PlayerData).getBoolean("isonline");
         playerInventory = player.getInventory();
         infoinv = createInventory(player, 6 * 9, "关于玩家" + player.getName() + "的详情信息");
@@ -1022,6 +1022,13 @@ class Info_Command implements TabExecutor {
                 motdt = config.getLong("server-motd.motd-time",3000L);
                 per = config.getBoolean("permissions",true);
                 for(Player p : getOnlinePlayers()) {
+                    File PlayerData = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + File.separator + p.getName() + ".yml");
+                    boolean isonline = YamlConfiguration.loadConfiguration(PlayerData).getBoolean("isonline");
+                    if(isonline){
+                        String newname = config.getString("online-player-prefix","§a[正版玩家]§r") + p.getName();
+                        p.setDisplayName(newname);
+                        p.setPlayerListName(newname);
+                    }
                     if (per) {
                         List c = config.getList("permissions-list", null);
                         String s;

@@ -12,7 +12,6 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.*;
-import org.bukkit.permissions.ServerOperator;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -101,13 +100,18 @@ public class Lisener implements org.bukkit.event.Listener {
                         playerconfig.set("isonline",isonline);
                         b = true;
                         try {
-                            playerconfig.save(new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + "\\" + e.getPlayer().getName() + ".yml"));
+                            playerconfig.save(new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + File.separator + e.getPlayer().getName() + ".yml"));
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
                         break;
                 }
             }
+        }
+        if(isonline){
+            String newname = config.getString("online-player-prefix","§a[正版玩家]§r") + e.getPlayer().getName();
+            e.getPlayer().setDisplayName(newname);
+            e.getPlayer().setPlayerListName(newname);
         }
         if(!b){
             File file = new File(dishao.getPlugin(dishao.class).getDataFolder().getAbsolutePath() + File.separator + "PlayerData" + File.separator + e.getPlayer().getName() + ".yml");
@@ -127,7 +131,7 @@ public class Lisener implements org.bukkit.event.Listener {
                 throw new RuntimeException(ex);
             }
         }
-        e.setJoinMessage(ChatColor.BLUE + "玩家" + e.getPlayer().getName() + "加入了游戏!");
+        e.setJoinMessage(config.getString("join-message","§9玩家%player%加入了游戏!").replace("%player%",e.getPlayer().getName()));
         Bukkit.getScheduler().runTask(plugin, new Runnable() {
             @Override
             public void run() {
@@ -161,11 +165,6 @@ public class Lisener implements org.bukkit.event.Listener {
                 break;
             }
         }
-        if (b) {
-            getLogger().info("true");
-        } else {
-            getLogger().info("false");
-        }
         if (!b) {
             e.setQuitMessage("");
             return;
@@ -177,7 +176,7 @@ public class Lisener implements org.bukkit.event.Listener {
                 break;
             }
         }
-        e.setQuitMessage(ChatColor.RED + "玩家" + e.getPlayer().getName() + "退出了游戏!");
+        e.setQuitMessage(config.getString("quit-message","§c玩家%player%退出了游戏!").replace("%player%",e.getPlayer().getName()));
     }
     @EventHandler
     public void OnMotd(ServerListPingEvent e){
