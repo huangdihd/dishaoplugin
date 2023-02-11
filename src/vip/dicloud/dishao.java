@@ -52,10 +52,14 @@ class Pinv{
             name.setItemMeta(meta);
         }
         ItemMeta mm = name.getItemMeta();
-        if(isonline){
-            mm.setLore(Arrays.asList(player.getName(),ChatColor.GREEN + "正版验证"));
-        }else{
-            mm.setLore(Arrays.asList(player.getName(),ChatColor.DARK_BLUE + "离线验证"));
+        if(!config.getBoolean("player-online-check",false)){
+            mm.setLore(Arrays.asList(player.getName()));
+        }else {
+            if (isonline) {
+                mm.setLore(Arrays.asList(player.getName(), ChatColor.GREEN + "正版验证"));
+            } else {
+                mm.setLore(Arrays.asList(player.getName(), ChatColor.DARK_BLUE + "离线验证"));
+            }
         }
         mm.setDisplayName("玩家详情");
         name.setItemMeta(mm);

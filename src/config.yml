@@ -29,7 +29,7 @@ server-motd:
 superuser: ''
 #名字范围
 name-range: ^[A-Za-z\u4e00-\u9fa50-9_\-]+$
-#正版验证查询请在网络通畅的情况下开启
+#正版验证查询请在网络通畅的情况下开启(更改后请重启服务器,reload对该选项无效)
 player-online-check: false
 #进入游戏的消息("%player%"表示玩家名字)
 join-message: §9玩家%player%加入了游戏!
