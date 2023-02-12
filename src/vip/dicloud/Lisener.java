@@ -65,32 +65,35 @@ public class Lisener implements org.bukkit.event.Listener {
         boolean b = false;
         boolean isonline = false;
         String playerName = e.getPlayer().getName();
-        if(config.getBoolean("player-online-check",false)) {
-            try {
-                URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + playerName);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setUseCaches(false);
-                connection.setConnectTimeout(2500);
-                connection.setReadTimeout(2500);
-                connection.connect();
-
-                int responseCode = connection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    InputStream inputStream = connection.getInputStream();
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    JsonObject jsonObject = new JsonParser().parse(inputStreamReader).getAsJsonObject();
-                    UUID playerUUID = UUID.fromString(jsonObject.get("id").getAsString().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
-                    isonline = e.getPlayer().getUniqueId().equals(playerUUID);
-                    //e.getPlayer().sendMessage(ChatColor.BLUE + playerUUID.toString() + ChatColor.GREEN + e.getPlayer().getUniqueId() + ChatColor.YELLOW + isonline);
-                } else {
-                    isonline = false;
+        if (playerName.length() >= 3 && playerName.length() <= 16 && playerName.matches("[a-zA-Z0-9_]+")) {
+            if (config.getBoolean("player-online-check", false)) {
+                try {
+                    URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + playerName);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setUseCaches(false);
+                    connection.setConnectTimeout(2500);
+                    connection.setReadTimeout(2500);
+                    connection.connect();
+                    int responseCode = connection.getResponseCode();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        InputStream inputStream = connection.getInputStream();
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                        JsonObject jsonObject = new JsonParser().parse(inputStreamReader).getAsJsonObject();
+                        UUID playerUUID = UUID.fromString(jsonObject.get("id").getAsString().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
+                        isonline = e.getPlayer().getUniqueId().equals(playerUUID);
+                        //e.getPlayer().sendMessage(ChatColor.BLUE + playerUUID.toString() + ChatColor.GREEN + e.getPlayer().getUniqueId() + ChatColor.YELLOW + isonline);
+                    } else if (responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
+                        e.getPlayer().kickPlayer("微软服务器繁忙，请稍后再试(最长10分钟)");
+                    } else if (responseCode == HttpURLConnection.HTTP_GATEWAY_TIMEOUT || responseCode == HttpURLConnection.HTTP_CLIENT_TIMEOUT) {
+                        e.getPlayer().kickPlayer("连接微软正版验证api超时,如多次发生这个错误,请联系腐竹关闭正版检测功能或更换正版账号不允许的用户名");
+                    }
+                } catch (Exception E) {
+                    e.getPlayer().kickPlayer("无法连接微软正版验证api,请联系腐竹关闭正版检测功能或更换正版账号不允许的用户名");
                 }
-            } catch (Exception E) {
-                E.printStackTrace();
             }
         }
-        if(PlayerData.listFiles().length != 0) {
+        if(Objects.requireNonNull(PlayerData.listFiles()).length != 0) {
             for (File i : PlayerData.listFiles()){
                 FileConfiguration playerconfig = YamlConfiguration.loadConfiguration(i);
                     if(i.getName().equals(e.getPlayer().getName() + ".yml")){

@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.CachedServerIcon;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -283,6 +284,7 @@ class PPlayer {
 }
 
 public class dishao extends JavaPlugin {
+    private boolean[] previousOpStatus;
     static String Motd;
     static FileConfiguration config;
     static ArrayList<String> motdl;
@@ -292,6 +294,15 @@ public class dishao extends JavaPlugin {
     static ArrayList<Pinv> pinvlist = new ArrayList<>();
     static String OBC;
     static String NMS;
+    public int min(int a,int b){
+        if(a > b){
+            return b;
+        }
+        if (b > a) {
+            return a;
+        }
+        return b;
+    }
     public void onEnable() {
         saveDefaultConfig();
         saveConfig();
@@ -454,6 +465,46 @@ public class dishao extends JavaPlugin {
         }if(getPlugin(dishao.class).getDescription().getVersion().getBytes()[getPlugin(dishao.class).getDescription().getVersion().length() - 1] == 'B'){
             getLogger().info("该版本为测试版本,不保证稳定!");
         }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Player[] onlinePlayers = Bukkit.getServer().getOnlinePlayers().toArray(new Player[0]);
+                boolean[] currentOpStatus = new boolean[onlinePlayers.length];
+
+                for (int i = 0; i < onlinePlayers.length; i++) {
+                    currentOpStatus[i] = onlinePlayers[i].isOp();
+                }
+
+                if (previousOpStatus == null) {
+                    previousOpStatus = currentOpStatus;
+                } else {
+                    for (int i = 0; i < min(currentOpStatus.length,previousOpStatus.length); i++) {
+                        if (currentOpStatus[i] != previousOpStatus[i]) {
+                            Player player = onlinePlayers[i];
+                            if (per) {
+                                List c = config.getList("permissions-list", null);
+                                String s;
+                                for (int j = 0; j < c.size(); j++) {
+                                    s = (String) c.get(j);
+                                    if(!player.isOp()) {
+                                        player.addAttachment((Plugin) dishao.getPlugin(dishao.class), s, true);
+                                    }
+                                }
+                                c = config.getList("off-permissions-list", null);
+                                for (int j = 0; j < c.size(); j++) {
+                                    s = (String) c.get(j);
+                                    if (!player.isOp()) {
+                                        player.addAttachment((Plugin) dishao.getPlugin(dishao.class), s, false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    previousOpStatus = currentOpStatus;
+                }
+            }
+        }.runTaskTimer(this, 0L, 2L);
     }
     public void onDisable() {
         getLogger().info("插件已卸载");
