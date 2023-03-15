@@ -1,6 +1,7 @@
 package vip.dicloud;
 
 import org.bukkit.*;
+import vip.dicloud.Metrics;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -304,6 +305,7 @@ public class dishao extends JavaPlugin {
         return b;
     }
     public void onEnable() {
+        Metrics metrics = new Metrics(this, 17966);
         saveDefaultConfig();
         saveConfig();
         config = dishao.getPlugin(dishao.class).getConfig();
