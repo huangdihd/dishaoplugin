@@ -183,14 +183,16 @@ public class Lisener implements org.bukkit.event.Listener {
     }
     @EventHandler
     public void OnMotd(ServerListPingEvent e){
-        e.setMotd(Motd.replace("%nl%","\n"));
-        e.setServerIcon(icon);
-        if(config.getBoolean("server-motd.load-print")){
-            if(!Motd.contains("%nl%")){
-                dishao.getPlugin(dishao.class).getLogger().info("ip为" + e.getAddress() + "的玩家加载了标题:" + Motd);
-            }else{
-                for(String i : Motd.split("%nl%")){
-                    dishao.getPlugin(dishao.class).getLogger().info("ip为" + e.getAddress() + "的玩家加载了标题:" + i);
+        if(config.getBoolean("server-motd.enable")) {
+            e.setMotd(Motd.replace("%nl%", "\n"));
+            e.setServerIcon(icon);
+            if (config.getBoolean("server-motd.load-print")) {
+                if (!Motd.contains("%nl%")) {
+                    dishao.getPlugin(dishao.class).getLogger().info("ip为" + e.getAddress() + "的玩家加载了标题:" + Motd);
+                } else {
+                    for (String i : Motd.split("%nl%")) {
+                        dishao.getPlugin(dishao.class).getLogger().info("ip为" + e.getAddress() + "的玩家加载了标题:" + i);
+                    }
                 }
             }
         }
