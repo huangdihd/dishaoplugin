@@ -1,6 +1,6 @@
 name: dishao
 main: vip.dicloud.dishao
-version: 1.11.2-B
+version: 1.11.2-R
 api-version: 1.16
 authors: [ DicloudStudio ]
 commands:
