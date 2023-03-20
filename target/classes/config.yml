@@ -16,6 +16,8 @@ off-permissions-list:
 detect-updates: true
 #服务器标题
 server-motd:
+  #是否开启标题功能
+  enable: true
   #服务器标题列表("%nl%"代表换行)
   motd-list:
     - 第一行%nl%第二行
