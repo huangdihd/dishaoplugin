@@ -597,46 +597,46 @@ class Tell_Command implements TabExecutor {
                 return true;
             }
         }
-            if (args.length != 2) {
-                if (args.length == 1) {
-                    new Bukkitio().commandsay(commandSender,"缺少参数:[内容]");
-                    return true;
-                }
-                new Bukkitio().commandsay(commandSender,"使用/w [玩家id] [内容]或/tell [玩家id] [内容]来进行私聊");
+        if (args.length != 2) {
+            if (args.length == 1) {
+                new Bukkitio().commandsay(commandSender,"缺少参数:[内容]");
                 return true;
             }
-            PPlayer pPlayer = new PPlayer();
-            if (pPlayer.isplayer(args[0]) || args[0].toLowerCase().equals("server")) {
-                Player player2 = (Player) getPlayer(args[0]);
-                if ((commandSender instanceof Player) || (!args[0].toLowerCase().equals("server"))) {
-                    if(commandSender instanceof Player){
-                        if((Player)commandSender == getPlayer(args[0])){
-                            new Bukkitio().commandsay(commandSender,"错误:不能给自己发私聊!");
-                            return true;
-                        }
-                        new Bukkitio().commandsay(commandSender,ChatColor.LIGHT_PURPLE + "发到"  + args[0] + "的私聊:" + args[1]);
-                        if(args[0].toLowerCase().equals("server")){
-                            new Bukkitio().saytoserver(ChatColor.LIGHT_PURPLE + "来自" + commandSender.getName() + "的私聊:" + args[1]);
-                        }else{
-                            player2.sendMessage(ChatColor.LIGHT_PURPLE + "来自" + commandSender.getName() + "的私聊:" + args[1]);
-                        }
-                    }else{
-                        if(args[0].toLowerCase().equals("server")){
-                            new Bukkitio().commandsay(commandSender,"错误:不能给自己发私聊!");
-                            return true;
-                        }
-                        new Bukkitio().commandsay(commandSender,ChatColor.LIGHT_PURPLE + "发到" + args[0] + "的私聊:" + args[1]);
-                        player2.sendMessage(ChatColor.LIGHT_PURPLE + "来自服务器控制台的私聊:" + args[1]);
+            new Bukkitio().commandsay(commandSender,"使用/w [玩家id] [内容]或/tell [玩家id] [内容]来进行私聊");
+            return true;
+        }
+        PPlayer pPlayer = new PPlayer();
+        if (pPlayer.isplayer(args[0]) || args[0].toLowerCase().equals("server")) {
+            Player player2 = (Player) getPlayer(args[0]);
+            if ((commandSender instanceof Player) || (!args[0].toLowerCase().equals("server"))) {
+                if(commandSender instanceof Player){
+                    if((Player)commandSender == getPlayer(args[0])){
+                        new Bukkitio().commandsay(commandSender,"错误:不能给自己发私聊!");
+                        return true;
                     }
-
-                } else {
-                    new Bukkitio().commandsay(commandSender,"错误:不能给自己发私聊!");
+                    new Bukkitio().commandsay(commandSender,ChatColor.LIGHT_PURPLE + "发到"  + args[0] + "的私聊:" + args[1]);
+                    if(args[0].toLowerCase().equals("server")){
+                        new Bukkitio().saytoserver(ChatColor.LIGHT_PURPLE + "来自" + commandSender.getName() + "的私聊:" + args[1]);
+                    }else{
+                        player2.sendMessage(ChatColor.LIGHT_PURPLE + "来自" + commandSender.getName() + "的私聊:" + args[1]);
+                    }
+                }else{
+                    if(args[0].toLowerCase().equals("server")){
+                        new Bukkitio().commandsay(commandSender,"错误:不能给自己发私聊!");
+                        return true;
+                    }
+                    new Bukkitio().commandsay(commandSender,ChatColor.LIGHT_PURPLE + "发到" + args[0] + "的私聊:" + args[1]);
+                    player2.sendMessage(ChatColor.LIGHT_PURPLE + "来自服务器控制台的私聊:" + args[1]);
                 }
-                return true;
-            }else{
-                new Bukkitio().commandsay(commandSender,"错误:玩家不存在或离线!");
+
+            } else {
+                new Bukkitio().commandsay(commandSender,"错误:不能给自己发私聊!");
             }
             return true;
+        }else{
+            new Bukkitio().commandsay(commandSender,"错误:玩家不存在或离线!");
+        }
+        return true;
     }
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         if(!(sender instanceof Player)){
@@ -962,7 +962,7 @@ class Info_Command implements TabExecutor {
                     }else if(args[1].equals("permissions-list")){
                         if(args.length == 4){
                             if(args[2].equals("add")){
-                                
+
                                 List c = config.getList("permissions-list", null);
                                 c.add(args[3]);
                                 config.set("permissions-list",c);
@@ -970,7 +970,7 @@ class Info_Command implements TabExecutor {
                                 new Bukkitio().commandsay(commandSender,"成功在permission-list中添加" + args[3] + "!");
                                 return true;
                             }else if(args[2].equals("remove")){
-                                
+
                                 List c = config.getList("permissions-list", null);
                                 if(!c.contains(args[3])){
                                     new Bukkitio().commandsay(commandSender,"错误的参数:[值]");
@@ -1003,7 +1003,7 @@ class Info_Command implements TabExecutor {
                                 dishao.getPlugin(dishao.class).saveConfig();
                                 return true;
                             }else if(args[2].equals("remove")){
-                                
+
                                 List c = config.getList("off-permissions-list", null);
                                 if(!c.contains(args[3])){
                                     new Bukkitio().commandsay(commandSender,"错误的参数:[值]");
@@ -1129,7 +1129,7 @@ class Info_Command implements TabExecutor {
         }
         new Bukkitio().commandsay(commandSender,"插件版本:" + dishao.getPlugin(dishao.class).getDescription().getVersion());
         new Bukkitio().commandsay(commandSender,"配置文件情况:");
-        
+
         boolean per = config.getBoolean("permissions",true);
         if(per){
             new Bukkitio().commandsay(commandSender,"权限管理模块(permissions):开启");
