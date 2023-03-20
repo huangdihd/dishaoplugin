@@ -296,13 +296,7 @@ public class dishao extends JavaPlugin {
     static String OBC;
     static String NMS;
     public int min(int a,int b){
-        if(a > b){
-            return b;
-        }
-        if (b > a) {
-            return a;
-        }
-        return b;
+        return Math.min(a, b);
     }
     public void onEnable() {
         Metrics metrics = new Metrics(this, 17966);
