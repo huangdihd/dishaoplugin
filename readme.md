@@ -26,11 +26,13 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    \- bukkit.command.tps  
    \#非op玩家关闭的权限  
    off-permissions-list:  
-   \- minecraft.command.seed
+   \- minecraft.command.seed  
    \#插件启动时检测更新  
    detect-updates: true  
    \#服务器标题  
-   server-motd:  
+   server-motd:
+   \#是否开启标题功能
+   enable: true
    \#服务器标题列表("%nl%"代表换行)  
    motd-list:  
    \- 第一行%nl%第二行  
@@ -44,6 +46,14 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    superuser: ''  
    \#名字范围  
    name-range: ^[A-Za-z\u4e00-\u9fa50-9_\-]+$  
+   #正版验证查询请在网络通畅的情况下开启(更改后请重启服务器,reload对该选项无效)  
+   player-online-check: false  
+   #进入游戏的消息("%player%"表示玩家名字)  
+   join-message: §9玩家%player%加入了游戏!  
+   #退出游戏的消息("%player%"表示玩家名字)  
+   quit-message: §c玩家%player%退出了游戏!  
+   #正版玩家的前缀(没有请用双引号代替,只对tab列表和聊天栏有效)  
+   online-player-prefix: §a[正版玩家]§r  
 2. 权限列表:
    dishao.tp: 传送命令的权限   
    dishao.tell:  私聊命令的权限  
@@ -121,7 +131,7 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
 当player的背包被更改,世界被更改,移动或传送时,将调用Pinv对象中的上传方法,背包,将盔甲,游戏模式,所在世界,和位置上传至详情界面
 详情界面为一个6*9的物品栏,如下图:  
 ![](./playerinfogui.png)  
-当鼠标放到钻石上时,会显示玩家的名字,如下图  
+当鼠标放到头颅上时,会显示,玩家正版验证状态,玩家的名字,如下图  
 ![](./name.png)  
 当鼠标放到第三个物品上时,会显示玩家的游戏模式,根据游戏模式,图标也会变化(和客户端使用f3+f4切换游戏模式时图标一样),如下图:  
 ![](./0.png)  
@@ -139,9 +149,9 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
 
 # 各个文件夹的作用
 ## PlayerData
-顾名思义,存放了每个登陆过玩家的名字,uuid,最后一次登录ip,血量,游戏模式,是否为op
+顾名思义,存放了每个登陆过玩家的名字,uuid,最后一次登录ip,是否为正版
 ## ImageData
-储存每个地图对应图片的文件,请尽量不要删除,否则后果不堪设想!
+储存每个地图对应图片的文件,请尽量不要删除!
 ## image
 储存需要在地图上出现的图片,如果你使用了文件夹内的文件,请不要再将它删除,否则服务端可能会不停的报错!
 # 参与贡献
