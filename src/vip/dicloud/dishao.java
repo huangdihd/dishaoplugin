@@ -285,6 +285,7 @@ class PPlayer {
 }
 
 public class dishao extends JavaPlugin {
+    static ArrayList<BufferedImage> ImageData;
     private boolean[] previousOpStatus;
     static String Motd;
     static FileConfiguration config;
@@ -356,6 +357,7 @@ public class dishao extends JavaPlugin {
         if(!new File(getDataFolder().getAbsolutePath() + File.separator + "ImageData").exists()) {
             new File(getDataFolder().getAbsolutePath() + File.separator + "ImageData").mkdir();
         }
+
         motdt = config.getLong("server-motd.motd-time", 3000L);
         motdl = (ArrayList<String>) config.getList("server-motd.motd-list");
         new Thread(() -> {
@@ -398,16 +400,16 @@ public class dishao extends JavaPlugin {
                 for(MapRenderer j : map.getRenderers()){
                     map.removeRenderer(j);
                 }
+                String filename = YamlConfiguration.loadConfiguration(i).getString("image");
+                try {
+                    ImageData.add(ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename)));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 map.addRenderer(new MapRenderer() {
                     @Override
                     public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-                        try {
-                            String filename = YamlConfiguration.loadConfiguration(i).getString("image");
-                            BufferedImage image =  ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename));
-                            mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        mapCanvas.drawImage(0,0,MapPalette.resizeImage(ImageData.get(ImageData.toArray().length - 1)));
                     }
                 });
             }
@@ -541,41 +543,12 @@ class Help_Command implements TabExecutor {
                 return true;
             }
         }
-        if(args.length > 0) {
-            if (args[0].equals("514")) {
-                new Bukkitio().commandsay(commandSender,ChatColor.BLUE + "/514:" + ChatColor.GREEN + "使用/514来自杀");
-                return true;
-            }
-            if(args[0].equals("w")){
-                new Bukkitio().commandsay(commandSender,ChatColor.BLUE + "/w:" + ChatColor.GREEN + "使用/w来进行私聊");
-                return true;
-            }if(args[0].equals("out")){
-                new Bukkitio().commandsay(commandSender,ChatColor.BLUE + "/out:" + ChatColor.GREEN + "使用/out来退出服务器");
-                return true;
-            }
-        }
-        new Bukkitio().commandsay(commandSender,"dishao插件帮助列表:");
-        new Bukkitio().commandsay(commandSender,ChatColor.BLUE + "/514:" + ChatColor.GREEN + "使用/514来自杀");
-        new Bukkitio().commandsay(commandSender,ChatColor.BLUE + "/w:" + ChatColor.GREEN + "使用/w来进行私聊");
-        new Bukkitio().commandsay(commandSender,ChatColor.BLUE + "/out:" + ChatColor.GREEN + "使用/out来退出服务器");
+        new Bukkitio().commandsay(commandSender,config.getString("help"));
         return true;
     }
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         if(!(sender instanceof Player)){
             return null;
-        }
-        if(args.length == 1){
-            List n = new ArrayList<>();
-            n.add("514");n.add("w");n.add("out");
-            List s = new ArrayList<>();
-            PPlayer pPlayer = new PPlayer();
-            for(int i = 0;i < n.size();i++){
-                String g = (String) n.get(i);
-                if(pPlayer.in(g,args[0])){
-                    s.add(g);
-                }
-            }
-            return s;
         }
         List n = new ArrayList<>();
         return n;
@@ -1100,22 +1073,12 @@ class Info_Command implements TabExecutor {
                 }
                 if(Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()).length != 0){
                     for(File i : new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()){
-                        MapView map =  Bukkit.getMap(YamlConfiguration.loadConfiguration(i).getInt("id"));
-                        for(MapRenderer j : map.getRenderers()){
-                            map.removeRenderer(j);
+                        String filename = YamlConfiguration.loadConfiguration(i).getString("image");
+                        try {
+                            ImageData.add(ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename)));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
-                        map.addRenderer(new MapRenderer() {
-                            @Override
-                            public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-                                try {
-                                    String filename = YamlConfiguration.loadConfiguration(i).getString("image");
-                                    BufferedImage image =  ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename));
-                                    mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
                     }
                 }
                 new Bukkitio().commandsay(commandSender,"插件已重载");

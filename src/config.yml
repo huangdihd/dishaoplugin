@@ -33,9 +33,15 @@ superuser: ''
 name-range: ^[A-Za-z\u4e00-\u9fa50-9_\-]+$
 #正版验证查询请在网络通畅的情况下开启(更改后请重启服务器,reload对该选项无效)
 player-online-check: false
+#无法连接正版验证API时的踢出显示
+can_not_connect_API: 无法连接正版验证api,请重试,若多次出现该错误请联系服主关闭正版检测功能或更换正版账号不允许的用户名
+#正版验证API请求数到达上限时的踢出显示
+too_many_queries: 正版验证api查询次数达到峰值,请稍后再试(最多等待10分钟)
 #进入游戏的消息("%player%"表示玩家名字)
 join-message: §9玩家%player%加入了游戏!
 #退出游戏的消息("%player%"表示玩家名字)
 quit-message: §c玩家%player%退出了游戏!
 #正版玩家的前缀(没有请用双引号代替,只对tab列表和聊天栏有效)
 online-player-prefix: §a[正版玩家]§r
+#输入/help后向玩家发送的内容
+help: §c服主没有配置帮助
