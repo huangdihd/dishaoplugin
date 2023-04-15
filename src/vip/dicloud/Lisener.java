@@ -89,7 +89,7 @@ public class Lisener implements org.bukkit.event.Listener {
                         e.getPlayer().kickPlayer(config.getString("can_not_connect_API"));
                     }
                 } catch (Exception E) {
-                    e.getPlayer().kickPlayer(config.getString(""));
+                    e.getPlayer().kickPlayer(config.getString("time_out"));
                 }
             }
         }
