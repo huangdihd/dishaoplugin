@@ -432,9 +432,6 @@ public class dishao extends JavaPlugin {
         if (getPluginCommand("out") != null) {
             Objects.requireNonNull(getPluginCommand("out")).setExecutor(new Out_command());
         }
-        if (getPluginCommand("tp") != null) {
-            Objects.requireNonNull(getPluginCommand("tp")).setExecutor(new Tp_command());
-        }
         if (getPluginCommand("kick") != null) {
             Objects.requireNonNull(getPluginCommand("kick")).setExecutor(new Kick_command());
         }
@@ -647,103 +644,6 @@ class Out_command implements CommandExecutor {
         }
         Player player = (Player) commandSender;
         player.kickPlayer("您已退出服务器");
-        return true;
-    }
-}
-class Tp_command implements CommandExecutor {
-    @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
-        if(!(commandSender instanceof Player)){
-            new Bukkitio().commandsay(commandSender,"不能让服务器tp");
-            return true;
-        }
-        Player player = (Player) commandSender;
-        if(!player.hasPermission("dishao.tp")){
-            player.sendMessage(ChatColor.DARK_RED + "你没有使用该指令的权限!");
-            return true;
-        }
-        if(args.length == 1 || args.length == 3){
-            if(args.length == 1){
-                Player p = getPlayer(args[0]);
-                PPlayer pPlayer = new PPlayer();
-                if(pPlayer.isplayer(args[0])){
-                    player.teleport(new Location(getPlayer(args[0]).getWorld(), getPlayer(args[0]).getLocation().getBlockX(), getPlayer(args[0]).getLocation().getBlockY(), getPlayer(args[0]).getLocation().getBlockZ()));
-                    return true;
-                }
-                boolean l = true;
-                String commands = "";
-                if(args[0].charAt(0) == '-' && args[0].length() != 1){
-                    commands = args[0].substring(1);
-                }
-                for(int i = 0;i < args[0].length();i++){
-                    l = Character.isDigit(commands.charAt(i));
-                    if(!l){break;}
-                }
-                if(l){
-                    player.sendMessage("缺少参数:[y],[z]");
-                    return true;
-                }else{
-                    player.sendMessage("错误:玩家不存在或离线!");
-                    return true;
-                }
-            }else{
-                String commands1 = "";
-                if(args[0].charAt(0) == '-' && args[0].length() != 1){
-                    commands1 = args[0].substring(1);
-                }
-                String commands2 = "";
-                if(args[1].charAt(0) == '-' && args[1].length() != 1){
-                    commands2 = args[1].substring(1);
-                }
-                String commands3 = "";
-                if(args[2].charAt(0) == '-' && args[1].length() != 1){
-                    commands3 = args[2].substring(1);
-                }
-                boolean l = true;
-                for(int i = 0;i < commands1.length();i++){
-                    l = Character.isDigit(commands1.charAt(i));
-                    if(!l){break;}
-                }
-                boolean y = true;
-                for(int i = 0;i < commands2.length();i++){
-                    y = Character.isDigit(commands2.charAt(i));
-                    if(!y){break;}
-                }
-                boolean s = true;
-                for(int i = 0;i < commands3.length();i++){
-                    s = Character.isDigit(commands3.charAt(i));
-                    if(!s){break;}
-                }
-                if(l && y && s){
-                    player.teleport(new Location(player.getWorld(), Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-                    return true;
-                }
-            }
-        }else if(args.length == 2){
-            String commands1 = "";
-            if(args[0].charAt(0) == '-' && args[0].length() != 1){
-                commands1 = args[0].substring(1);
-            }
-            String commands2 = "";
-            if(args[1].charAt(0) == '-' && args[1].length() != 1){
-                commands2 = args[1].substring(1);
-            }
-            boolean l = true;
-            for(int i = 0;i < commands1.length();i++){
-                l = Character.isDigit(commands1.charAt(i));
-                if(!l){break;}
-            }
-            boolean y = true;
-            for(int i = 0;i < commands2.length();i++){
-                y = Character.isDigit(commands2.charAt(i));
-                if(!y){break;}
-            }
-            if(l && y){
-                player.sendMessage("缺少参数:[z]");
-                return true;
-            }
-        }
-        player.sendMessage("/tp用法:/tp [x] [y] [z]或者/tp [玩家名称]");
         return true;
     }
 }
@@ -1243,19 +1143,16 @@ class image_Command implements TabExecutor{
                 }
                 Player player = (Player) commandSender;
                 MapView map = Bukkit.createMap(player.getWorld());
-                BufferedImage image;
+                String filename = args[0];
                 try {
-                    image = ImageIO.read(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + args[0]));
+                    ImageData.add(ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
-                }
-                for (MapRenderer renderer : map.getRenderers()) {
-                    map.removeRenderer(renderer);
                 }
                 map.addRenderer(new MapRenderer() {
                     @Override
                     public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-                        mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
+                        mapCanvas.drawImage(0,0,MapPalette.resizeImage(ImageData.get(ImageData.toArray().length - 1)));
                     }
                 });
                 ItemStack item = new ItemStack(Material.FILLED_MAP);

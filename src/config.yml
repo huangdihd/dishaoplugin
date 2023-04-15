@@ -4,7 +4,6 @@ permissions: true
 #给予非op玩家的权限
 permissions-list:
   - dishao.help
-  - dishao.tp
   - dishao.tell
   - dishao.out
   - dishao.zisha

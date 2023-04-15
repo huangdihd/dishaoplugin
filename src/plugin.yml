@@ -26,11 +26,6 @@ commands:
     permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "out"
-  tp:
-    permission: "dishao.tp"
-    permission-message: "§4你没有使用该指令的权限!"
-    aliases:
-      - "tp"
   kick:
     permission: "dishao.kick"
     permission-message: "§4你没有使用该指令的权限!"
@@ -59,8 +54,6 @@ commands:
       - "image"
       - "img"
 permissions:
-  dishao.tp:
-    description: Dishao plugins tp command
   dishao.tell:
     description: Dishao plugins tell command
   dishao.help:

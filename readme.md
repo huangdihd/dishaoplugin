@@ -12,50 +12,55 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
 # 使用说明
 
 1. 默认配置文件及解释:  
-   \#开启后输出的文字(没有其他意义)  
+   #开启后输出的文字(没有其他意义)  
    say: 在插件目录下的config.yml中的say:后面更改要输出的内容  
-   \#是否开启dishao插件权限管理模块  
+   #是否开启dishao插件权限管理模块  
    permissions: true  
-   \#给予非op玩家的权限  
+   #给予非op玩家的权限  
    permissions-list:  
    \- dishao.help  
-   \- dishao.tp  
    \- dishao.tell  
    \- dishao.out  
    \- dishao.zisha  
    \- bukkit.command.tps  
-   \#非op玩家关闭的权限  
+   #非op玩家关闭的权限  
    off-permissions-list:  
    \- minecraft.command.seed  
    \#插件启动时检测更新  
    detect-updates: true  
-   \#服务器标题  
+   #服务器标题  
    server-motd:
-   \#是否开启标题功能
+   #是否开启标题功能
    enable: true
    \#服务器标题列表("%nl%"代表换行)  
    motd-list:  
    \- 第一行%nl%第二行  
-   \#每个标题等待时间  
+   #每个标题等待时间  
    motd-time: 3000  
-   \#加载标题输出  
+   #加载标题输出  
    load-print: true  
-   \#图标  
+   #图标  
    motd-icon: favicon.png  
-   \#超级用户  
+   #超级用户  
    superuser: ''  
-   \#名字范围  
+   #名字范围  
    name-range: ^[A-Za-z\u4e00-\u9fa50-9_\-]+$  
    #正版验证查询请在网络通畅的情况下开启(更改后请重启服务器,reload对该选项无效)  
    player-online-check: false  
+   #无法连接正版验证API时的踢出显示
+   can_not_connect_API: 无法连接正版验证api,请重试,若多次出现该错误请联系服主关闭正版检测功能或更换正版账号不允许的用户名
+   #正版验证API请求数到达上限时的踢出显示
+   too_many_queries: 正版验证api查询次数达到峰值,请稍后再试(最多等待10分钟)
+   #正版验证API请求超时的踢出显示
+   time_out: 正版验证api连接超时,请重试
+   #玩家进入游戏的消息("%player%"表示玩家名字)
    #进入游戏的消息("%player%"表示玩家名字)  
    join-message: §9玩家%player%加入了游戏!  
    #退出游戏的消息("%player%"表示玩家名字)  
    quit-message: §c玩家%player%退出了游戏!  
    #正版玩家的前缀(没有请用双引号代替,只对tab列表和聊天栏有效)  
    online-player-prefix: §a[正版玩家]§r  
-2. 权限列表:
-   dishao.tp: 传送命令的权限   
+2. 权限列表: 
    dishao.tell:  私聊命令的权限  
    dishao.help:  帮助命令的权限  
    dishao.out:  退出服务器命令的权限  
@@ -91,11 +96,6 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    \- "out"  
    命令
    命令详情:退出服务器
-   /tp:  
-   需要权限: "dishao.tp"  
-   命令名字:
-   \- "tp"  
-   命令详情:传送,/tp [玩家名字]或/tp [x] [y] [z]   
    /kick:  
    需要权限: "dishao.kick"  
    命令名字:
