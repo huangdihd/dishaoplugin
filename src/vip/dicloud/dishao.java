@@ -193,7 +193,7 @@ class Pinv{
 class Update{
     static String openFile(String filePath) {
         int HttpResult; // 服务器返回的状态
-        String ee = new String();
+        String ee = "-1";
         try
         {
             URL url =new URL(filePath); // 创建URL
@@ -202,7 +202,7 @@ class Update{
             HttpURLConnection httpconn =(HttpURLConnection)urlconn;
             HttpResult = httpconn.getResponseCode();
             if(HttpResult != HttpURLConnection.HTTP_OK) {
-                System.out.print("无法获取更新数据,请检查网络!");
+                plugin.getLogger().warning("无法获取更新数据,请检查网络!");
             } else {
                 InputStreamReader isReader = new InputStreamReader(urlconn.getInputStream(),"UTF-8");
                 BufferedReader reader = new BufferedReader(isReader);
@@ -212,9 +212,6 @@ class Update{
                 while (line != null) { // 如果 line 为空说明读完了
                     buffer.append(line);
                     line = reader.readLine();
-                    if(line != null){
-                        buffer.append("\n");
-                    }
                 }
                 System.out.print(buffer.toString());
                 ee = buffer.toString();
@@ -454,14 +451,15 @@ public class dishao extends JavaPlugin {
             Objects.requireNonNull(getPluginCommand("image")).setExecutor(new image_Command());
         }
         this.getServer().getPluginManager().registerEvents(new Lisener(), this);
-        if(update) {
+        if(getPlugin(dishao.class).getDescription().getVersion().getBytes()[getPlugin(dishao.class).getDescription().getVersion().length() - 1] == 'B'){
+            getLogger().info("该版本为测试版本,不保证稳定!");
+        }
+        else if(update) {
             String lastversion = Update.openFile("http://plugin.dicloud.vip/dishao_version.txt");
-            if (!lastversion.equals(dishao.getPlugin(dishao.class).getDescription().getVersion())) {
+            if ((!lastversion.equals(dishao.getPlugin(dishao.class).getDescription().getVersion())) && !lastversion.equals("-1")) {
                 getLogger().info("插件有新版本" + lastversion + "!");
                 getLogger().info("下载地址:plugin.dicloud.vip/dishao.jar");
             }
-        }if(getPlugin(dishao.class).getDescription().getVersion().getBytes()[getPlugin(dishao.class).getDescription().getVersion().length() - 1] == 'B'){
-            getLogger().info("该版本为测试版本,不保证稳定!");
         }
         new BukkitRunnable() {
             @Override
