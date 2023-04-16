@@ -30,7 +30,49 @@ import java.util.*;
 import java.util.List;
 
 import static org.bukkit.Bukkit.*;
+import static org.bukkit.map.MapPalette.resizeImage;
 import static vip.dicloud.dishao.*;
+
+class ImageMap extends MapRenderer{
+    private BufferedImage Iag;
+    private File fil;
+    private int id;
+    @Override
+    public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
+        if (this.Iag == null) {
+            return;
+        }
+        mapCanvas.drawImage(0, 0, Iag);
+        this.Iag = null;
+    }
+    public void setImage(BufferedImage Image) {
+        Iag = resizeImage(Image);
+    }
+    public static void installRenderer(MapView map, File Image) {
+        BufferedImage Img;
+        try {
+            Img = resizeImage(ImageIO.read(Image));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        ImageMap renderer = new ImageMap();
+        removeRenderers(map);
+        renderer.setImage(Img);
+        map.addRenderer(renderer);
+    }
+    public void setImageFile(File file,int id){
+        fil = file;
+        this.id = id;
+    }
+    public void update(){
+        ImageMap.installRenderer(Bukkit.getMap(id),fil);
+    }
+    public static void removeRenderers(MapView map) {
+        for (MapRenderer renderer : map.getRenderers()) {
+            map.removeRenderer(renderer);
+        }
+    }
+}
 
 class Pinv{
     Boolean isonline;
@@ -282,7 +324,7 @@ class PPlayer {
 }
 
 public class dishao extends JavaPlugin {
-    static ArrayList<BufferedImage> ImageData;
+    static ArrayList<ImageMap> ImageData = new ArrayList<>();
     private boolean[] previousOpStatus;
     static String Motd;
     static FileConfiguration config;
@@ -393,22 +435,11 @@ public class dishao extends JavaPlugin {
         }
         if(Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()).length != 0){
             for(File i : new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()){
-                MapView map =  Bukkit.getMap(YamlConfiguration.loadConfiguration(i).getInt("id"));
-                for(MapRenderer j : map.getRenderers()){
-                    map.removeRenderer(j);
-                }
-                String filename = YamlConfiguration.loadConfiguration(i).getString("image");
-                try {
-                    ImageData.add(ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                map.addRenderer(new MapRenderer() {
-                    @Override
-                    public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-                        mapCanvas.drawImage(0,0,MapPalette.resizeImage(ImageData.get(ImageData.toArray().length - 1)));
-                    }
-                });
+                MapView map =  Bukkit.getServer().getMap(YamlConfiguration.loadConfiguration(i).getInt("id"));
+                ImageMap imageMap = new ImageMap();
+                ImageMap.installRenderer(map,new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + YamlConfiguration.loadConfiguration(i).getString("image")));
+                imageMap.setImageFile(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + YamlConfiguration.loadConfiguration(i).getString("image")),map.getId());
+                ImageData.add(imageMap);
             }
         }
         getLogger().info("成功获取" + Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()).length + "个地图的图片数据!");
@@ -452,7 +483,7 @@ public class dishao extends JavaPlugin {
             getLogger().info("该版本为测试版本,不保证稳定!");
         }
         else if(update) {
-            String lastversion = Update.openFile("http://plugin.dicloud.vip/dishao_version.txt");
+            String lastversion = Update.openFile("https://plugin.dicloud.vip/dishao_version.txt");
             if ((!lastversion.equals(dishao.getPlugin(dishao.class).getDescription().getVersion())) && !lastversion.equals("-1")) {
                 getLogger().info("插件有新版本" + lastversion + "!");
                 getLogger().info("下载地址:plugin.dicloud.vip/dishao.jar");
@@ -970,13 +1001,8 @@ class Info_Command implements TabExecutor {
                     }
                 }
                 if(Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()).length != 0){
-                    for(File i : new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData").listFiles()){
-                        String filename = YamlConfiguration.loadConfiguration(i).getString("image");
-                        try {
-                            ImageData.add(ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename)));
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                    for(ImageMap i : ImageData){
+                        i.update();
                     }
                 }
                 new Bukkitio().commandsay(commandSender,"插件已重载");
@@ -1130,51 +1156,41 @@ class image_Command implements TabExecutor{
         if(commandSender instanceof Player) {
             if (args.length == 1) {
                 List imagel = new ArrayList<String>();
-                if(Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image").listFiles()).length == 0){
+                if (Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image").listFiles()).length == 0) {
                     commandSender.sendMessage("错误:无效的图片名!");
                     return true;
                 }
-                for(File i : new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image").listFiles()){
+                for (File i : Objects.requireNonNull(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image").listFiles())) {
                     imagel.add(i.getName());
                 }
-                if(!imagel.contains(args[0])){
+                if (!imagel.contains(args[0])) {
                     commandSender.sendMessage("错误:无效的图片名!");
                     return true;
                 }
                 Player player = (Player) commandSender;
-                MapView map = Bukkit.createMap(player.getWorld());
-                String filename = args[0];
-                try {
-                    ImageData.add(ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                map.addRenderer(new MapRenderer() {
-                    @Override
-                    public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-                        mapCanvas.drawImage(0,0,MapPalette.resizeImage(ImageData.get(ImageData.toArray().length - 1)));
-                    }
-                });
                 ItemStack item = new ItemStack(Material.FILLED_MAP);
-                MapMeta meta = (MapMeta)item.getItemMeta();
-                File mcf = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData" + File.separator + map.getId() + ".yml");
-                try {
-                    mcf.createNewFile();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                FileConfiguration mc = YamlConfiguration.loadConfiguration(mcf);
-                mc.set("id",map.getId());
-                mc.set("image",args[0]);
-                try {
-                    mc.save(mcf);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                assert meta != null;
-                meta.setMapView(map);
+                MapMeta meta = (MapMeta) item.getItemMeta();
+                meta.setMapView(Bukkit.createMap(player.getWorld()));
+                ImageMap imageMap = new ImageMap();
+                ImageMap.installRenderer(meta.getMapView(), new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + args[0]));
+                imageMap.setImageFile(new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + args[0]),meta.getMapId());
                 item.setItemMeta(meta);
+                ImageData.add(imageMap);
                 player.getInventory().addItem(item);
+                File con = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "ImageData" + File.separator + meta.getMapId() + ".yml");
+                try {
+                    con.createNewFile();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                FileConfiguration fconfig = YamlConfiguration.loadConfiguration(con);
+                fconfig.set("id",meta.getMapId());
+                fconfig.set("image",args[0]);
+                try {
+                    fconfig.save(con);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (args.length == 0) {
                 commandSender.sendMessage(ChatColor.DARK_RED + "缺少参数:[图片名]!");
             } else {
