@@ -1,8 +1,6 @@
 package vip.dicloud;
 
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -1407,7 +1405,9 @@ class Tpa_Command implements TabExecutor{
         player.sendMessage("成功向对方发起传送请求!");
         TextComponent component = new TextComponent(ChatColor.GREEN + "[同意]");
         component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaccept " + player.getName()));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("同意该玩家的传送请求").create()));
         TextComponent component1 = new TextComponent(ChatColor.RED + "[拒绝]");
+        component1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("拒绝该玩家的传送请求").create()));
         component1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpdeny " + player.getName()));
         BaseComponent[] components = new BaseComponent[]{
                 new TextComponent("玩家" + player.getName() + "请求传送到你当前的位置\n请选择:"),
