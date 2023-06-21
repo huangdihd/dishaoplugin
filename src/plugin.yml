@@ -1,6 +1,6 @@
 name: dishao
 main: vip.dicloud.dishao
-version: 1.11.4-B
+version: 1.11.4-R
 api-version: 1.16
 authors: [ DicloudStudio ]
 commands:
@@ -89,6 +89,11 @@ commands:
     permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "fly"
+  sudo:
+    permission: "dishao.sudo"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "sudo"
 permissions:
   dishao.tell:
     default: true
@@ -123,4 +128,6 @@ permissions:
   dishao.tpa:
     default: op
   dishao.fly:
+    default: op
+  dishao.sudo:
     default: op

@@ -542,6 +542,9 @@ public class dishao extends JavaPlugin {
         if (getPluginCommand("fly") != null) {
             Objects.requireNonNull(getPluginCommand("fly")).setExecutor(new Fly_Command());
         }
+        if (getPluginCommand("sudo") != null) {
+            Objects.requireNonNull(getPluginCommand("sudo")).setExecutor(new Sudo_Command());
+        }
         this.getServer().getPluginManager().registerEvents(new Lisener(), this);
         if(getPlugin(dishao.class).getDescription().getVersion().getBytes()[getPlugin(dishao.class).getDescription().getVersion().length() - 1] == 'B'){
             getLogger().info("该版本为测试版本,不保证稳定!");
@@ -1634,6 +1637,45 @@ class Fly_Command implements TabExecutor{
             player.sendMessage(commandSender.getName() + "将你的飞行模式设置为:关闭");
             commandSender.sendMessage("已经将" + player.getName() + "的飞行模式设置为:关闭");
         }
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if(args.length != 1){
+            return new ArrayList<>();
+        }
+        ArrayList<String> playerlist = new ArrayList<>();
+        for(Player i : Bukkit.getOnlinePlayers()){
+            playerlist.add(i.getName());
+        }
+        return playerlist;
+    }
+}
+class Sudo_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(args.length == 0){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:缺少参数[玩家]和[命令]!");
+            return true;
+        }
+        if(args.length == 1){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:缺少参数[命令]!");
+            return true;
+        }
+        if(!PPlayer.isplayer(args[0])){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
+            return true;
+        }
+        String cmd = "";
+        for(String i : args){
+            cmd = cmd +  i + " ";
+        }
+        Player player = Bukkit.getPlayer(args[0]);
+        boolean isOp = player.isOp();
+        player.setOp(true);
+        player.performCommand(cmd);
+        player.setOp(isOp);
+        commandSender.sendMessage("成功让玩家" + args[0] + "以op权限运行了指令:" + cmd + "!");
         return true;
     }
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
