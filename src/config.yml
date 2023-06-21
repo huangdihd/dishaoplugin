@@ -21,7 +21,7 @@ server-motd:
   #服务器标题列表("%nl%"代表换行)
   motd-list:
     - 第一行%nl%第二行
-  #每个标题等待时间
+  #每个标题等待时间(ms)
   motd-time: 3000
   #加载标题输出
   load-print: true
@@ -38,4 +38,12 @@ join-message: §9玩家%player%加入了游戏!
 #退出游戏的消息("%player%"表示玩家名字)
 quit-message: §c玩家%player%退出了游戏!
 #正版玩家的前缀(没有请用双引号代替,只对tab列表和聊天栏有效)
+<<<<<<< Updated upstream
 online-player-prefix: §a[正版玩家]§r
+=======
+online-player-prefix: §a[正版玩家]§r
+#输入/help后向玩家发送的内容
+help: §c服主没有配置帮助
+#tpa请求的保留时间(ms)
+tpa-keep-time: 120000
+>>>>>>> Stashed changes

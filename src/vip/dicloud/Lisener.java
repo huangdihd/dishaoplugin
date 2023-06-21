@@ -6,9 +6,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.*;
@@ -230,17 +232,17 @@ public class Lisener implements org.bukkit.event.Listener {
                     if(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(e.getWhoClicked().getOpenInventory().getTopInventory()).getItem(1)).getItemMeta()).getLore()).size() == 1) {
                         if (e.getRawSlot() < 0 || e.getRawSlot() >= e.getInventory().getSize()) {//如果在GUI外(背包)
                             for (Pinv i : pinvlist) {
-                                i.upinfoinv();
+                                if(e.getWhoClicked().equals(i.getPlayer())) i.upinfoinv();
                             }
                         } else {//在gui里面
                             for (Pinv i : pinvlist) {
-                                i.downinfoinv();
+                                if(e.getWhoClicked().equals(i.opener)) i.downinfoinv();
                             }
                         }
                     }
                 }
                 for(Pinv i : pinvlist){
-                    i.upinfoinv();
+                    if(e.getWhoClicked().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -251,7 +253,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for(Pinv i : pinvlist){
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
             }
         }});
     }
@@ -261,7 +263,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -272,7 +274,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -283,7 +285,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -294,7 +296,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -305,7 +307,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -316,18 +318,21 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
     }
     @EventHandler
     public void Onpick(EntityPickupItemEvent e){
+        if(!e.getEntityType().equals(EntityType.PLAYER)){
+            return;
+        }
         Bukkit.getScheduler().runTask(plugin, new Runnable() {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getEntity().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -338,7 +343,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -349,7 +354,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -360,7 +365,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -371,7 +376,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -382,7 +387,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -393,7 +398,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -412,7 +417,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -423,7 +428,7 @@ public class Lisener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 for (Pinv i : pinvlist) {
-                    i.upinfoinv();
+                    if(e.getPlayer().equals(i.getPlayer())) i.upinfoinv();
                 }
             }
         });
@@ -431,5 +436,13 @@ public class Lisener implements org.bukkit.event.Listener {
     @EventHandler
     public void OnClose(InventoryCloseEvent e){
         pinvlist.removeIf(i -> i.getOpener().equals(e.getPlayer()));
+    }
+    @EventHandler
+    public void OnDie(PlayerDeathEvent e){
+        UpDateBack(e.getEntity());
+    }
+    @EventHandler
+    public void OnTeleport(PlayerTeleportEvent e){
+        UpDateBack(e.getPlayer());
     }
 }

@@ -1,7 +1,9 @@
 package vip.dicloud;
 
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import vip.dicloud.Metrics;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,9 +30,61 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.*;
+import static org.bukkit.map.MapPalette.resizeImage;
 import static vip.dicloud.dishao.*;
+
+class ImageMap extends MapRenderer{
+    private BufferedImage Iag;
+    private File fil;
+    private int id;
+    @Override
+    public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
+        if (this.Iag == null) {
+            return;
+        }
+        mapCanvas.drawImage(0, 0, Iag);
+        this.Iag = null;
+    }
+    public void setImage(BufferedImage Image) {
+        Iag = resizeImage(Image);
+    }
+    public static void installRenderer(MapView map, File Image) {
+        BufferedImage Img;
+        try {
+            Img = resizeImage(ImageIO.read(Image));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        ImageMap renderer = new ImageMap();
+        removeRenderers(map);
+        renderer.setImage(Img);
+        map.addRenderer(renderer);
+    }
+    public void setImageFile(File file,int id){
+        fil = file;
+        this.id = id;
+    }
+    public void update(){
+        ImageMap.installRenderer(Bukkit.getMap(id),fil);
+    }
+    public static void removeRenderers(MapView map) {
+        for (MapRenderer renderer : map.getRenderers()) {
+            map.removeRenderer(renderer);
+        }
+    }
+}
+
+class Tpa{
+    Player player;
+    Player r_player;
+    public Tpa(Player player,Player r_player){
+        this.player = player;
+        this.r_player = r_player;
+    }
+}
 
 class Pinv{
     Boolean isonline;
@@ -261,7 +315,7 @@ class Bukkitio {
 
 
 class PPlayer {
-    public boolean isplayer(String s){
+    public static boolean isplayer(String s){
         for(Player p1 : getOnlinePlayers()){
             if(p1.getName().equals(s)){
                 return true;
@@ -293,8 +347,37 @@ public class dishao extends JavaPlugin {
     static CachedServerIcon icon;
     static Plugin plugin;
     static ArrayList<Pinv> pinvlist = new ArrayList<>();
+    static ArrayList<Tpa> tpalist = new ArrayList<>();
     static String OBC;
     static String NMS;
+    static File DataFolder;
+    public static void UpDateHome(Player player){
+        YamlConfiguration yaml = getPlayerConfig(player);
+        yaml.set("home.world",player.getWorld().getName());
+        yaml.set("home.x",player.getLocation().getX());
+        yaml.set("home.y",player.getLocation().getY());
+        yaml.set("home.z",player.getLocation().getZ());
+        try {
+            yaml.save(DataFolder.getAbsolutePath() + "PlayerData" + File.separator + player.getName() + ".yml");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void UpDateBack(Player player){
+        YamlConfiguration yaml = getPlayerConfig(player);
+        yaml.set("back.world",player.getWorld().getName());
+        yaml.set("back.x",player.getLocation().getX());
+        yaml.set("back.y",player.getLocation().getY());
+        yaml.set("back.z",player.getLocation().getZ());
+        try {
+            yaml.save(DataFolder.getAbsolutePath() + "PlayerData" + File.separator + player.getName() + ".yml");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static YamlConfiguration getPlayerConfig(Player player){
+        return YamlConfiguration.loadConfiguration(new File(DataFolder.getAbsolutePath() + "PlayerData" + File.separator + player.getName() + ".yml"));
+    }
     public int min(int a,int b){
         if(a > b){
             return b;
@@ -319,6 +402,7 @@ public class dishao extends JavaPlugin {
         getLogger().info("By DicloudStudio");
         getLogger().info("插件已加载");
         getLogger().info("配置文件情况:");
+        DataFolder = getDataFolder();
         boolean per = config.getBoolean("permissions",true);
         boolean update = config.getBoolean("detect-updates",true);
         plugin = getPlugin(dishao.class);
@@ -410,7 +494,7 @@ public class dishao extends JavaPlugin {
                         try {
                             String filename = YamlConfiguration.loadConfiguration(i).getString("image");
                             BufferedImage image =  ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename));
-                            mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
+                            mapCanvas.drawImage(0,0, resizeImage(image));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -456,6 +540,27 @@ public class dishao extends JavaPlugin {
         }
         if (getPluginCommand("image") != null) {
             Objects.requireNonNull(getPluginCommand("image")).setExecutor(new image_Command());
+        }
+        if (getPluginCommand("back") != null) {
+            Objects.requireNonNull(getPluginCommand("back")).setExecutor(new Back_Command());
+        }
+        if (getPluginCommand("home") != null) {
+            Objects.requireNonNull(getPluginCommand("home")).setExecutor(new Home_Command());
+        }
+        if (getPluginCommand("sethome") != null) {
+            Objects.requireNonNull(getPluginCommand("sethome")).setExecutor(new SetHome_Command());
+        }
+        if (getPluginCommand("hat") != null) {
+            Objects.requireNonNull(getPluginCommand("hat")).setExecutor(new Hat_Command());
+        }
+        if (getPluginCommand("tpa") != null) {
+            Objects.requireNonNull(getPluginCommand("tpa")).setExecutor(new Tpa_Command());
+        }
+        if (getPluginCommand("tpaccept") != null) {
+            Objects.requireNonNull(getPluginCommand("tpaccept")).setExecutor(new Tpaccept_Command());
+        }
+        if (getPluginCommand("tpdeny") != null) {
+            Objects.requireNonNull(getPluginCommand("tpdeny")).setExecutor(new Tpdeny_Command());
         }
         this.getServer().getPluginManager().registerEvents(new Lisener(), this);
         if(update) {
@@ -794,8 +899,7 @@ class Kick_command implements TabExecutor {
         Player player = (Player) commandSender;
         if(args.length == 2){
             Player p = getPlayer(args[0]);
-            PPlayer pPlayer = new PPlayer();
-            if(pPlayer.isplayer(args[0])){
+            if(PPlayer.isplayer(args[0])){
                 new ti(p,args[1]);
                 new Bukkitio().commandsay(commandSender,"您已成功踢出玩家" + args[0] + "原因:" + args[1]);
                 return true;
@@ -1116,7 +1220,7 @@ class Info_Command implements TabExecutor {
                                 try {
                                     String filename = YamlConfiguration.loadConfiguration(i).getString("image");
                                     BufferedImage image =  ImageIO.read( new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "image" + File.separator + filename));
-                                    mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
+                                    mapCanvas.drawImage(0,0, resizeImage(image));
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -1300,7 +1404,7 @@ class image_Command implements TabExecutor{
                 map.addRenderer(new MapRenderer() {
                     @Override
                     public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-                        mapCanvas.drawImage(0,0,MapPalette.resizeImage(image));
+                        mapCanvas.drawImage(0,0, resizeImage(image));
                     }
                 });
                 ItemStack item = new ItemStack(Material.FILLED_MAP);
@@ -1343,5 +1447,309 @@ class image_Command implements TabExecutor{
             n.add(i.getName());
         }
         return n;
+    }
+}
+class Back_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(!(commandSender instanceof Player)){
+            commandSender.sendMessage("非玩家不能使用该命令!");
+            return true;
+        }
+        Player player = (Player) commandSender;
+        YamlConfiguration yaml = getPlayerConfig(player);
+        if(yaml.getString("back.world") == null){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:没有可用的上个位置!");
+            return true;
+        }
+        player.teleport(new Location(Bukkit.getWorld(yaml.getString("back.world")),yaml.getDouble("back.x"),yaml.getDouble("back.y"),yaml.getDouble("back.z")));
+        player.sendMessage("成功传送到上一个地点!");
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        return new ArrayList<>();
+    }
+}
+class Home_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(!(commandSender instanceof Player)){
+            commandSender.sendMessage("非玩家不能使用该命令!");
+            return true;
+        }
+        Player player = (Player) commandSender;
+        YamlConfiguration yaml = getPlayerConfig(player);
+        if(yaml.getString("home.world") == null){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:没有设置家!");
+            return true;
+        }
+        player.teleport(new Location(Bukkit.getWorld(yaml.getString("home.world")),yaml.getDouble("home.x"),yaml.getDouble("home.y"),yaml.getDouble("home.z")));
+        player.sendMessage("成功传送家!");
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        return new ArrayList<>();
+    }
+}
+class SetHome_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(!(commandSender instanceof Player)){
+            commandSender.sendMessage("非玩家不能使用该命令!");
+            return true;
+        }
+        Player player = (Player) commandSender;
+        commandSender.sendMessage("成功设置家的位置于:" + player.getLocation().getBlockX() + "," + player.getLocation().getBlockY() + "," + player.getLocation().getBlockZ() + "!");
+        UpDateHome((Player) commandSender);
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        return new ArrayList<>();
+    }
+}
+class Hat_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(!(commandSender instanceof Player)){
+            commandSender.sendMessage("非玩家不能使用该命令!");
+            return true;
+        }
+        Player player = (Player) commandSender;
+        if(player.getInventory().getItemInMainHand().getType().equals(Material.VOID_AIR)){
+            player.sendMessage(ChatColor.DARK_RED + "错误:手上没有物品!");
+            return true;
+        }
+        ItemStack item = player.getInventory().getItemInMainHand();
+        player.getInventory().setItemInMainHand(player.getInventory().getHelmet());
+        player.getInventory().setHelmet(item);
+        commandSender.sendMessage("成功带上了新帽子!");
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        return new ArrayList<>();
+    }
+}
+class Tpa_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(!(commandSender instanceof Player)){
+            commandSender.sendMessage("非玩家不能使用该命令!");
+            return true;
+        }
+        Player player = (Player) commandSender;
+        if(args.length == 0){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:缺少参数[玩家]!");
+            return true;
+        }
+        if(args.length != 1){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:过多的参数!");
+            return true;
+        }
+        if(!PPlayer.isplayer(args[0])){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
+            return true;
+        }
+        Player r_player = Bukkit.getPlayer(args[0]);
+        if(r_player.equals(player)){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:不能给自己发传送请求!");
+            return true;
+        }
+        boolean b = false;
+        for(Tpa i : tpalist){
+            if(i.r_player.equals(r_player) && i.player.equals(player)){
+                b = true;
+                break;
+            }
+        }
+        if(b){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:你已经给该玩家发送过传送请求了!");
+            return true;
+        }
+        Tpa tpa = new Tpa(player,r_player);
+        BukkitRunnable task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(tpalist.contains(tpa)) tpalist.remove(tpa);
+            }
+        };
+        task.runTaskLater(plugin, config.getLong("tpa-keep-time",120000L) / 50);
+        player.sendMessage("成功向对方发起传送请求!");
+        TextComponent component = new TextComponent(ChatColor.GREEN + "[同意]");
+        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaccept " + player.getName()));
+        TextComponent component1 = new TextComponent(ChatColor.RED + "[拒绝]");
+        component1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpdeny " + player.getName()));
+        BaseComponent[] components = new BaseComponent[]{
+                new TextComponent("玩家" + player.getName() + "请求传送到你当前的位置\n请选择:"),
+                component,
+                new TextComponent("  "),
+                component1,
+                new TextComponent("\n" + config.getLong("tpa-keep-time",120000L) / 1000 + "秒后失效!")
+        };
+        r_player.spigot().sendMessage(components);
+        tpalist.add(tpa);
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        ArrayList<String> playerlist = new ArrayList<>();
+        for(Player i : Bukkit.getOnlinePlayers()){
+            if(!i.equals(sender)){
+                playerlist.add(i.getName());
+            }
+        }
+        return playerlist;
+    }
+}
+class Tpaccept_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(!(commandSender instanceof Player)){
+            commandSender.sendMessage("非玩家不能使用该命令!");
+            return true;
+        }
+        Player player = (Player) commandSender;
+        if(args.length == 0){
+            int c = 0;
+            for(Tpa i : tpalist){
+                if(i.r_player.equals(commandSender)){
+                    c++;
+                }
+            }
+            if(c >= 2){
+                commandSender.sendMessage(ChatColor.DARK_RED + "错误:缺少参数[玩家]!");
+                return true;
+            }
+            if(c == 0){
+                commandSender.sendMessage(ChatColor.DARK_RED + "错误:没有玩家向你发起了传送请求!");
+                return true;
+            }
+            Tpa tpa = null;
+            for(Tpa i : tpalist){
+                if(i.r_player.equals(commandSender)){
+                    tpa = i;
+                    break;
+                }
+            }
+            tpa.player.teleport(tpa.r_player);
+            tpa.player.sendMessage("玩家" + tpa.r_player.getName() + "同意了你的传送请求!");
+            tpa.r_player.sendMessage("你同意了玩家" + tpa.r_player.getName() + "的传送请求!");
+            tpalist.remove(tpa);
+            return true;
+        }
+        if(args.length != 1){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:过多的参数!");
+            return true;
+        }
+        boolean b = true;
+        for(Tpa i : tpalist){
+            if(i.r_player.equals(player) && i.player.equals(Bukkit.getPlayer(args[0]))){
+                b = false;
+                break;
+            }
+        }
+        if(b){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:该玩家没有向你发送传送请求或玩家不存在!");
+            return true;
+        }
+        Tpa tpa = null;
+        for(Tpa i : tpalist){
+            if(i.r_player.equals(commandSender)){
+                if(i.player.equals(Bukkit.getPlayer(args[0]))){
+                    tpa = i;
+                    break;
+                }
+            }
+        }
+        tpa.player.teleport(tpa.r_player);
+        tpa.player.sendMessage("玩家" + tpa.r_player.getName() + "同意了你的传送请求!");
+        tpa.r_player.sendMessage("你同意了玩家" + tpa.r_player.getName() + "的传送请求!");
+        tpalist.remove(tpa);
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        ArrayList<String> playerlist = new ArrayList<>();
+        for(Tpa i : tpalist){
+            if(i.r_player.equals(sender)){
+                playerlist.add(i.player.getName());
+            }
+        }
+        return playerlist;
+    }
+}
+class Tpdeny_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(!(commandSender instanceof Player)){
+            commandSender.sendMessage("非玩家不能使用该命令!");
+            return true;
+        }
+        Player player = (Player) commandSender;
+        if(args.length == 0){
+            int c = 0;
+            for(Tpa i : tpalist){
+                if(i.r_player.equals(commandSender)){
+                    c++;
+                }
+            }
+            if(c >= 2){
+                commandSender.sendMessage(ChatColor.DARK_RED + "错误:缺少参数[玩家]!");
+                return true;
+            }
+            if(c == 0){
+                commandSender.sendMessage(ChatColor.DARK_RED + "错误:没有玩家向你发起了传送请求!");
+            }
+            Tpa tpa = null;
+            for(Tpa i : tpalist){
+                if(i.r_player.equals(commandSender)){
+                    tpa = i;
+                    break;
+                }
+            }
+            tpa.player.sendMessage("玩家" + tpa.r_player.getName() + "拒绝了你的传送请求!");
+            tpa.r_player.sendMessage("你拒绝了玩家" + tpa.r_player.getName() + "的传送请求!");
+            tpalist.remove(tpa);
+            return true;
+        }
+        if(args.length != 1){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:过多的参数!");
+            return true;
+        }
+        boolean b = true;
+        for(Tpa i : tpalist){
+            if(i.r_player.equals(player) && i.player.equals(Bukkit.getPlayer(args[0]))){
+                b = false;
+                break;
+            }
+        }
+        if(b){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:该玩家没有向你发送传送请求或玩家不存在!");
+            return true;
+        }
+        Tpa tpa = null;
+        for(Tpa i : tpalist){
+            if(i.r_player.equals(commandSender)){
+                tpa = i;
+                break;
+            }
+        }
+        tpa.player.sendMessage("玩家" + tpa.r_player.getName() + "拒绝了你的传送请求!");
+        tpa.r_player.sendMessage("你拒绝了玩家" + tpa.r_player.getName() + "的传送请求!");
+        tpalist.remove(tpa);
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        ArrayList<String> playerlist = new ArrayList<>();
+        for(Tpa i : tpalist){
+            if(i.r_player.equals(sender)){
+                playerlist.add(i.player.getName());
+            }
+        }
+        return playerlist;
     }
 }

@@ -1,6 +1,10 @@
 name: dishao
 main: vip.dicloud.dishao
+<<<<<<< Updated upstream
 version: 1.11.2-R
+=======
+version: 1.11.4-B
+>>>>>>> Stashed changes
 api-version: 1.16
 authors: [ DicloudStudio ]
 commands:
@@ -9,6 +13,21 @@ commands:
     permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "514"
+  back:
+    permission: "dishao.back"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "back"
+  sethome:
+    permission: "dishao.sethome"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "sethome"
+  home:
+    permission: "dishao.home"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "home"
   help:
     permission: "dishao.help"
     permission-message: "§4你没有使用该指令的权限!"
@@ -58,30 +77,54 @@ commands:
     aliases:
       - "image"
       - "img"
+  hat:
+    permission: "dishao.hat"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "hat"
+  tpa:
+    permission: "dishao.tpa"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "tpa"
+  tpaccept:
+    aliases:
+      - "tpaccept"
+  tpdeny:
+    aliases:
+      - "tpaccept"
 permissions:
   dishao.tp:
     description: Dishao plugins tp command
   dishao.tell:
-    description: Dishao plugins tell command
+    default: true
   dishao.help:
-    description: Dishao plugins help command
+    default: true
   dishao.out:
-    description: Dishao plugins out command
+    default: true
   dishao.zisha:
-    description: Dishao plugins zisha command
+    default: true
   dishao.kick:
-    description: Dishao plugins kick command
+    default: op
   dishao.main_command.info:
-    description: Dishao plugins main_info command
+    default: op
   dishao.main_command:
-    description: Dishao plugins main command
+    default: op
   dishao.main_command.config:
-    description: Dishao plugins main_config command
+    default: op
   dishao.main_command.reload:
-    description: Dishao plugins main_reload command
+    default: op
   dishao.playerinfo:
-    description: Dishao plugins main_reload command
+    default: op
   dishao.image:
-    description: Dishao plugins main_reload command
+    default: op
+  dishao.back:
+    default: op
+  dishao.sethome:
+    default: op
+  dishao.home:
+    default: op
+  dishao.hat:
+    default: true
   dishao.tpa:
-    description: Dishao plugins main_reload command
+    default: op
