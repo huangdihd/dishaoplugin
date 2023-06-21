@@ -1619,6 +1619,14 @@ class Fly_Command implements TabExecutor{
         }
         Player player = Bukkit.getPlayer(args[0]);
         player.setAllowFlight(!player.getAllowFlight());
+        if(player.equals(commandSender)){
+            if(player.getAllowFlight()){
+                commandSender.sendMessage("已经将你的飞行模式设置为:开启");
+            }else{
+                commandSender.sendMessage("已经将你的飞行模式设置为:关闭");
+            }
+            return true;
+        }
         if(player.getAllowFlight()){
             player.sendMessage(commandSender.getName() + "将你的飞行模式设置为:开启");
             commandSender.sendMessage("已经将" + player.getName() + "的飞行模式设置为:开启");
