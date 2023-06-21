@@ -1462,8 +1462,8 @@ class Tpaccept_Command implements TabExecutor{
                 }
             }
             tpa.player.teleport(tpa.r_player);
-            tpa.player.sendMessage("玩家" + tpa.player.getName() + "同意了你的传送请求!");
-            tpa.r_player.sendMessage("你同意了玩家" + tpa.r_player.getName() + "的传送请求!");
+            tpa.player.sendMessage("玩家" + tpa.r_player.getName() + "同意了你的传送请求!");
+            tpa.r_player.sendMessage("你同意了玩家" + tpa.player.getName() + "的传送请求!");
             tpalist.remove(tpa);
             return true;
         }
@@ -1492,8 +1492,8 @@ class Tpaccept_Command implements TabExecutor{
             }
         }
         tpa.player.teleport(tpa.r_player);
-        tpa.player.sendMessage("玩家" + tpa.player.getName() + "同意了你的传送请求!");
-        tpa.r_player.sendMessage("你同意了玩家" + tpa.r_player.getName() + "的传送请求!");
+        tpa.player.sendMessage("玩家" + tpa.r_player.getName() + "同意了你的传送请求!");
+        tpa.r_player.sendMessage("你同意了玩家" + tpa.player.getName() + "的传送请求!");
         tpalist.remove(tpa);
         return true;
     }
@@ -1537,8 +1537,8 @@ class Tpdeny_Command implements TabExecutor{
                     break;
                 }
             }
-            tpa.player.sendMessage("玩家" + tpa.player.getName() + "拒绝了你的传送请求!");
-            tpa.r_player.sendMessage("你拒绝了玩家" + tpa.r_player.getName() + "的传送请求!");
+            tpa.player.sendMessage("玩家" + tpa.r_player.getName() + "拒绝了你的传送请求!");
+            tpa.r_player.sendMessage("你拒绝了玩家" + tpa.player.getName() + "的传送请求!");
             tpalist.remove(tpa);
             return true;
         }
@@ -1564,8 +1564,8 @@ class Tpdeny_Command implements TabExecutor{
                 break;
             }
         }
-        tpa.player.sendMessage("玩家" + tpa.player.getName() + "拒绝了你的传送请求!");
-        tpa.r_player.sendMessage("你拒绝了玩家" + tpa.r_player.getName() + "的传送请求!");
+        tpa.player.sendMessage("玩家" + tpa.r_player.getName() + "拒绝了你的传送请求!");
+        tpa.r_player.sendMessage("你拒绝了玩家" + tpa.player.getName() + "的传送请求!");
         tpalist.remove(tpa);
         return true;
     }
