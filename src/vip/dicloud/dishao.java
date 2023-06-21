@@ -1421,6 +1421,9 @@ class Tpa_Command implements TabExecutor{
         return true;
     }
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if(args.length != 1){
+            return new ArrayList<>();
+        }
         ArrayList<String> playerlist = new ArrayList<>();
         for(Player i : Bukkit.getOnlinePlayers()){
             if(!i.equals(sender)){
@@ -1498,6 +1501,9 @@ class Tpaccept_Command implements TabExecutor{
         return true;
     }
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if(args.length != 1){
+            return new ArrayList<>();
+        }
         ArrayList<String> playerlist = new ArrayList<>();
         for(Tpa i : tpalist){
             if(i.r_player.equals(sender)){
@@ -1570,6 +1576,9 @@ class Tpdeny_Command implements TabExecutor{
         return true;
     }
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if(args.length != 1){
+            return new ArrayList<>();
+        }
         ArrayList<String> playerlist = new ArrayList<>();
         for(Tpa i : tpalist){
             if(i.r_player.equals(sender)){
