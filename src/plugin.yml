@@ -1,10 +1,6 @@
 name: dishao
 main: vip.dicloud.dishao
-<<<<<<< Updated upstream
-version: 1.11.2-R
-=======
 version: 1.11.4-B
->>>>>>> Stashed changes
 api-version: 1.16
 authors: [ DicloudStudio ]
 commands:
@@ -45,11 +41,6 @@ commands:
     permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "out"
-  tp:
-    permission: "dishao.tp"
-    permission-message: "§4你没有使用该指令的权限!"
-    aliases:
-      - "tp"
   kick:
     permission: "dishao.kick"
     permission-message: "§4你没有使用该指令的权限!"
@@ -94,8 +85,6 @@ commands:
     aliases:
       - "tpaccept"
 permissions:
-  dishao.tp:
-    description: Dishao plugins tp command
   dishao.tell:
     default: true
   dishao.help:

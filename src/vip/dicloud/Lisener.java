@@ -86,12 +86,12 @@ public class Lisener implements org.bukkit.event.Listener {
                         isonline = e.getPlayer().getUniqueId().equals(playerUUID);
                         //e.getPlayer().sendMessage(ChatColor.BLUE + playerUUID.toString() + ChatColor.GREEN + e.getPlayer().getUniqueId() + ChatColor.YELLOW + isonline);
                     } else if (responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
-                        e.getPlayer().kickPlayer("微软服务器繁忙，请稍后再试(最长10分钟)");
+                        e.getPlayer().kickPlayer(config.getString("too_many_queries"));
                     } else if (responseCode == HttpURLConnection.HTTP_GATEWAY_TIMEOUT || responseCode == HttpURLConnection.HTTP_CLIENT_TIMEOUT) {
-                        e.getPlayer().kickPlayer("连接微软正版验证api超时,如多次发生这个错误,请联系腐竹关闭正版检测功能或更换正版账号不允许的用户名");
+                        e.getPlayer().kickPlayer(config.getString("can_not_connect_API"));
                     }
                 } catch (Exception E) {
-                    e.getPlayer().kickPlayer("无法连接微软正版验证api,请联系腐竹关闭正版检测功能或更换正版账号不允许的用户名");
+                    e.getPlayer().kickPlayer(config.getString("time_out"));
                 }
             }
         }
