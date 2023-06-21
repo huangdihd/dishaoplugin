@@ -1607,6 +1607,7 @@ class Fly_Command implements TabExecutor{
             }else{
                 commandSender.sendMessage("已经将你的飞行模式设置为:关闭");
             }
+            return true;
         }
         if(args.length != 1){
             commandSender.sendMessage(ChatColor.DARK_RED + "错误:过多的参数!");
