@@ -84,6 +84,11 @@ commands:
   tpdeny:
     aliases:
       - "tpaccept"
+  fly:
+    permission: "dishao.fly"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "fly"
 permissions:
   dishao.tell:
     default: true
@@ -116,4 +121,6 @@ permissions:
   dishao.hat:
     default: true
   dishao.tpa:
+    default: op
+  dishao.fly:
     default: op

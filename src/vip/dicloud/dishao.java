@@ -539,6 +539,9 @@ public class dishao extends JavaPlugin {
         if (getPluginCommand("tpdeny") != null) {
             Objects.requireNonNull(getPluginCommand("tpdeny")).setExecutor(new Tpdeny_Command());
         }
+        if (getPluginCommand("fly") != null) {
+            Objects.requireNonNull(getPluginCommand("fly")).setExecutor(new Fly_Command());
+        }
         this.getServer().getPluginManager().registerEvents(new Lisener(), this);
         if(getPlugin(dishao.class).getDescription().getVersion().getBytes()[getPlugin(dishao.class).getDescription().getVersion().length() - 1] == 'B'){
             getLogger().info("该版本为测试版本,不保证稳定!");
@@ -1584,6 +1587,53 @@ class Tpdeny_Command implements TabExecutor{
             if(i.r_player.equals(sender)){
                 playerlist.add(i.player.getName());
             }
+        }
+        return playerlist;
+    }
+}
+class Fly_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(args.length == 0){
+            if(!(commandSender instanceof Player)){
+                commandSender.sendMessage(ChatColor.DARK_RED + "错误:缺少参数[玩家]!");
+                return true;
+            }
+            Player player = (Player) commandSender;
+            player.setAllowFlight(!player.getAllowFlight());
+            if(player.getAllowFlight()){
+                commandSender.sendMessage("已经将你的飞行模式设置为:开启");
+            }else{
+                commandSender.sendMessage("已经将你的飞行模式设置为:关闭");
+            }
+        }
+        if(args.length != 1){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:过多的参数!");
+            return true;
+        }
+        if(!PPlayer.isplayer(args[0])){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
+            return true;
+        }
+        Player player = Bukkit.getPlayer(args[0]);
+        player.setAllowFlight(!player.getAllowFlight());
+        if(player.getAllowFlight()){
+            player.sendMessage(commandSender.getName() + "将你的飞行模式设置为:开启");
+            commandSender.sendMessage("已经将" + player.getName() + "的飞行模式设置为:开启");
+        }else{
+            player.sendMessage(commandSender.getName() + "将你的飞行模式设置为:关闭");
+            commandSender.sendMessage("已经将" + player.getName() + "的飞行模式设置为:关闭");
+        }
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if(args.length != 1){
+            return new ArrayList<>();
+        }
+        ArrayList<String> playerlist = new ArrayList<>();
+        for(Player i : Bukkit.getOnlinePlayers()){
+            playerlist.add(i.getName());
         }
         return playerlist;
     }
