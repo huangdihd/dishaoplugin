@@ -35,7 +35,7 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    \#服务器标题列表("%nl%"代表换行)  
    motd-list:  
    \- 第一行%nl%第二行  
-   #每个标题等待时间  
+   #每个标题等待时间(ms)  
    motd-time: 3000  
    #加载标题输出  
    load-print: true  
@@ -60,6 +60,8 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    quit-message: §c玩家%player%退出了游戏!  
    #正版玩家的前缀(没有请用双引号代替,只对tab列表和聊天栏有效)  
    online-player-prefix: §a[正版玩家]§r  
+   #tpa请求的保留时间(ms)  
+   tpa-keep-time: 120000
 2. 权限列表: 
    dishao.tell:  私聊命令的权限  
    dishao.help:  帮助命令的权限  
@@ -70,8 +72,15 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    dishao.main_command:  主命令的权限  
    dishao.main_command.config:  命令更改配置文件的权限  
    dishao.main_command.reload:  重载插件的权限
-   dishao.playerinfo: 打开玩家详情gui的权限  
-   dishao.image: 获取图片地图的权限  
+   dishao.playerinfo:  打开玩家详情gui的权限  
+   dishao.image:  获取图片地图的权限  
+   dishao.back:  回到上一个位置的权限  
+   dishao.sethome:  设置家的权限  
+   dishao.home:  传送到家的权限  
+   dishao.hat:  将物品放在头上的权限  
+   dishao.tpa:  发出传送请求的权限  
+   dishao.fly:  开关飞行模式的权限
+   dishao.sudo:  强制玩家以op权限运行命令的权限
 3. 命令列表  
    /514:
    需要权限: "dishao.zisha"  
@@ -124,7 +133,52 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    命令名字:  
    \- "image"  
    \- "img"  
-   命令详情: 将图片放在服务器根目录/plugin/dishao/image,输入/image [图片文件名],你就会获得一个印有选定图像的地图,128x128,如果不是正方形会进行拉伸.
+   命令详情: 将图片放在服务器根目录/plugin/dishao/image,输入/image [图片文件名],你就会获得一个印有选定图像的地图,128x128,如果不是正方形会进行拉伸.  
+   /back:  
+   需要权限:"dishao.back"
+   命令名字:  
+   \- "back"  
+   命令详情: 回到上一个地点,会在死亡和传送时更新  
+   /sethome:  
+   需要权限:"dishao.sethome"
+   命令名字:  
+   \- "sethome"  
+   命令详情: 设置家
+   /home:  
+   需要权限:"dishao.home"
+   命令名字:  
+   \- "home"  
+   命令详情: 传送家  
+   /hat:  
+   需要权限:"dishao.hat"
+   命令名字:  
+   \- "hat"  
+   命令详情: 将手上的物品放在头上  
+   /tpa:  
+   需要权限:"dishao.tpa"
+   命令名字:  
+   \- "tpa"  
+   命令详情: 向其他玩家发送传送请求,/tpa [玩家名字]  
+   /tpaccept:  
+   需要权限:无
+   命令名字:  
+   \- "tpaccept"  
+   命令详情: 同意其他玩家的传送请求,/tpaccept或/tpaccept [玩家名字]  
+   /tpdeny:  
+   需要权限:无
+   命令名字:  
+   \- "tpdeny"  
+   命令详情: 拒绝其他玩家的传送请求,/tpdeny或/tpdeny [玩家名字]  
+   /fly:  
+   需要权限:"dishao.fly"
+   命令名字:  
+   \- "fly"  
+   命令详情: 开关玩家的飞行模式,/fly或/fly [玩家名字]  
+   /sudo:  
+   需要权限:"dishao.sudo"
+   命令名字:  
+   \- "sudo"  
+   命令详情: 强制让玩家以op权限运行一个命令,/sudo [玩家名字] [命令]  
 # 详情界面详情
 ## GUI界面
 当打开一个玩家的详情界面时,会产生一个Pinv对象。其中包含Opener(打开者),player(被打开者)  
@@ -149,7 +203,7 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
 
 # 各个文件夹的作用
 ## PlayerData
-顾名思义,存放了每个登陆过玩家的名字,uuid,最后一次登录ip,是否为正版
+顾名思义,存放了每个登陆过玩家的名字,uuid,最后一次登录ip,是否为正版,上一个位置,家的位置
 ## ImageData
 储存每个地图对应图片的文件,请尽量不要删除!
 ## image
