@@ -1711,6 +1711,7 @@ class Chat_Command implements TabExecutor{
             }
             Player player = (Player) commandSender;
             player.chat(args[0]);
+            return true;
         }
         if(!PPlayer.isplayer(args[0])){
             commandSender.sendMessage(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
