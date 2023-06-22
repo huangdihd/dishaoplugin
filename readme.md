@@ -129,53 +129,53 @@ dishao插件,轻量级的基于spigotapi1.16+的基础插件
    \- "ds"  
    命令详情: 主命令,若没有参数或只有一个参数"info"则输出插件详情(需要权限"dishao.main_command.info"),若第一个参数是"reload"则重载插件(需要权限"dishao.main_command.reload"),若第一个参数是"config"更改配置文件,若第二个参数是数组,第三个参数输入"add"或者"remove",然后输入值来修改,若第二个参数是布尔类型变量,则第三个参数输入"true"或"false"(改完后不会立刻重载,需要权限"dishao.main_command.reload",所有主命令只要有权限"dishao.main_command都可以执行")  
    /image:  
-   需要权限:"dishao.image"
+   需要权限:"dishao.image"  
    命令名字:  
    \- "image"  
    \- "img"  
    命令详情: 将图片放在服务器根目录/plugin/dishao/image,输入/image [图片文件名],你就会获得一个印有选定图像的地图,128x128,如果不是正方形会进行拉伸.  
    /back:  
-   需要权限:"dishao.back"
+   需要权限:"dishao.back"  
    命令名字:  
    \- "back"  
    命令详情: 回到上一个地点,会在死亡和传送时更新  
    /sethome:  
-   需要权限:"dishao.sethome"
+   需要权限:"dishao.sethome"  
    命令名字:  
    \- "sethome"  
    命令详情: 设置家
    /home:  
-   需要权限:"dishao.home"
+   需要权限:"dishao.home"  
    命令名字:  
    \- "home"  
    命令详情: 传送家  
    /hat:  
-   需要权限:"dishao.hat"
+   需要权限:"dishao.hat"  
    命令名字:  
    \- "hat"  
    命令详情: 将手上的物品放在头上  
    /tpa:  
-   需要权限:"dishao.tpa"
+   需要权限:"dishao.tpa"  
    命令名字:  
    \- "tpa"  
    命令详情: 向其他玩家发送传送请求,/tpa [玩家名字]  
    /tpaccept:  
-   需要权限:无
+   需要权限:无  
    命令名字:  
    \- "tpaccept"  
    命令详情: 同意其他玩家的传送请求,/tpaccept或/tpaccept [玩家名字]  
    /tpdeny:  
-   需要权限:无
+   需要权限:无  
    命令名字:  
    \- "tpdeny"  
    命令详情: 拒绝其他玩家的传送请求,/tpdeny或/tpdeny [玩家名字]  
    /fly:  
-   需要权限:"dishao.fly"
+   需要权限:"dishao.fly"  
    命令名字:  
    \- "fly"  
    命令详情: 开关玩家的飞行模式,/fly或/fly [玩家名字]  
    /sudo:  
-   需要权限:"dishao.sudo"
+   需要权限:"dishao.sudo"  
    命令名字:  
    \- "sudo"  
    命令详情: 强制让玩家以op权限运行一个命令,/sudo [玩家名字] [命令]  
