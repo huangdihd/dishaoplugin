@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -354,7 +355,7 @@ public class dishao extends JavaPlugin {
         yaml.set("home.y",player.getLocation().getY());
         yaml.set("home.z",player.getLocation().getZ());
         try {
-            yaml.save(DataFolder.getAbsolutePath() + "PlayerData" + File.separator + player.getName() + ".yml");
+            yaml.save(DataFolder.getAbsolutePath() + File.separator + "PlayerData" + File.separator + player.getName() + ".yml");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -366,13 +367,13 @@ public class dishao extends JavaPlugin {
         yaml.set("back.y",player.getLocation().getY());
         yaml.set("back.z",player.getLocation().getZ());
         try {
-            yaml.save(DataFolder.getAbsolutePath() + "PlayerData" + File.separator + player.getName() + ".yml");
+            yaml.save(DataFolder.getAbsolutePath() + File.separator + "PlayerData" + File.separator + player.getName() + ".yml");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
     public static YamlConfiguration getPlayerConfig(Player player){
-        return YamlConfiguration.loadConfiguration(new File(DataFolder.getAbsolutePath() + "PlayerData" + File.separator + player.getName() + ".yml"));
+        return YamlConfiguration.loadConfiguration(new File(DataFolder.getAbsolutePath() + File.separator + "PlayerData" + File.separator + player.getName() + ".yml"));
     }
     public int min(int a,int b){
         return Math.min(a, b);
@@ -1349,7 +1350,7 @@ class Hat_Command implements TabExecutor{
             return true;
         }
         Player player = (Player) commandSender;
-        if(player.getInventory().getItemInMainHand().getType().equals(Material.VOID_AIR)){
+        if(player.getInventory().getItemInMainHand().getType().equals(Material.AIR)){
             player.sendMessage(ChatColor.DARK_RED + "错误:手上没有物品!");
             return true;
         }
@@ -1666,10 +1667,13 @@ class Sudo_Command implements TabExecutor{
             commandSender.sendMessage(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
             return true;
         }
+        String[] cmd1 = new String[args.length - 1];
+        System.arraycopy(args, 1, cmd1, 0, cmd1.length);
         String cmd = "";
-        for(String i : args){
+        for(String i : cmd1){
             cmd = cmd +  i + " ";
         }
+        cmd = cmd.substring(0, cmd.length() - 1);
         Player player = Bukkit.getPlayer(args[0]);
         boolean isOp = player.isOp();
         player.setOp(true);
