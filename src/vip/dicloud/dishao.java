@@ -1693,3 +1693,45 @@ class Sudo_Command implements TabExecutor{
         return playerlist;
     }
 }
+class Chat_Command implements TabExecutor{
+    @Override
+    @ParametersAreNonnullByDefault
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(args.length == 0){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:缺少参数[玩家]和[内容]!");
+            return true;
+        }
+        if(args.length == 1){
+            if(!(commandSender instanceof Player)) {
+                commandSender.sendMessage(ChatColor.DARK_RED + "错误:缺少参数[内容]!");
+                return true;
+            }
+            Player player = (Player) commandSender;
+            player.chat(args[0]);
+        }
+        if(!PPlayer.isplayer(args[0])){
+            commandSender.sendMessage(ChatColor.DARK_RED + "错误:玩家不存在或离线!");
+            return true;
+        }
+        String[] cmd1 = new String[args.length - 1];
+        System.arraycopy(args, 1, cmd1, 0, cmd1.length);
+        String cmd = "";
+        for(String i : cmd1){
+            cmd = cmd +  i + " ";
+        }
+        cmd = cmd.substring(0, cmd.length() - 1);
+        Player player = Bukkit.getPlayer(args[0]);
+        player.chat(cmd);
+        return true;
+    }
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if(args.length != 1){
+            return new ArrayList<>();
+        }
+        ArrayList<String> playerlist = new ArrayList<>();
+        for(Player i : Bukkit.getOnlinePlayers()){
+            playerlist.add(i.getName());
+        }
+        return playerlist;
+    }
+}

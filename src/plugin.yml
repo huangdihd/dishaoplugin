@@ -94,6 +94,12 @@ commands:
     permission-message: "§4你没有使用该指令的权限!"
     aliases:
       - "sudo"
+  chat:
+    permission: "dishao.chat"
+    permission-message: "§4你没有使用该指令的权限!"
+    aliases:
+      - "chat"
+      - "c"
 permissions:
   dishao.tell:
     default: true
@@ -131,3 +137,5 @@ permissions:
     default: op
   dishao.sudo:
     default: op
+  dishao.chat:
+    default: true
