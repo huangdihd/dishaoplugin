@@ -546,6 +546,9 @@ public class dishao extends JavaPlugin {
         if (getPluginCommand("sudo") != null) {
             Objects.requireNonNull(getPluginCommand("sudo")).setExecutor(new Sudo_Command());
         }
+        if (getPluginCommand("chat") != null) {
+            Objects.requireNonNull(getPluginCommand("chat")).setExecutor(new Chat_Command());
+        }
         this.getServer().getPluginManager().registerEvents(new Lisener(), this);
         if(getPlugin(dishao.class).getDescription().getVersion().getBytes()[getPlugin(dishao.class).getDescription().getVersion().length() - 1] == 'B'){
             getLogger().info("该版本为测试版本,不保证稳定!");
